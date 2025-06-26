@@ -565,7 +565,7 @@ function EvaluationContent() {
     setEvaluating(true)
 
     try {
-      if (currentQuestion.type === 'CODE') {
+      if (currentQuestion.type && currentQuestion.type.toLowerCase() === 'code') {
         const language = JSON.parse(currentQuestion.answer || '{}').language || 'javascript'
 
         const result = await getAIFeedback(
@@ -893,7 +893,7 @@ function EvaluationContent() {
 
   // Determinar el lenguaje de programación para preguntas de código
   let language = 'javascript'
-  if (currentQuestion && currentQuestion.type === 'CODE' && currentQuestion.answer) {
+  if (currentQuestion && currentQuestion.type && currentQuestion.type.toLowerCase() === 'code' && currentQuestion.answer) {
     try {
       const answerData = JSON.parse(currentQuestion.answer)
       language = answerData.language || 'javascript'
@@ -1047,8 +1047,8 @@ function EvaluationContent() {
           <CardHeader className="py-0 px-2 sm:px-4 flex-shrink-0 mb-1 sm:mb-2">
             <CardTitle className="flex justify-between items-center text-sm sm:text-base">
               <span>Pregunta {currentQuestionIndex + 1}</span>
-              <span className={`px-2 py-1 text-xs rounded-full ${currentQuestion.type === 'CODE' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'}`}>
-                {currentQuestion.type === 'CODE' ? 'Código' : 'Texto'}
+              <span className={`px-2 py-1 text-xs rounded-full ${currentQuestion.type && currentQuestion.type.toLowerCase() === 'code' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'}`}>
+                {currentQuestion.type && currentQuestion.type.toLowerCase() === 'code' ? 'Código' : 'Texto'}
               </span>
             </CardTitle>
           </CardHeader>          <CardContent className="flex-grow p-3 sm:p-4 min-h-[300px] sm:min-h-[400px] h-full relative">
@@ -1062,7 +1062,7 @@ function EvaluationContent() {
             <CardTitle className="flex flex-wrap sm:flex-nowrap justify-between items-center text-sm sm:text-base gap-1 sm:gap-0">
               <span>Tu Respuesta</span>
               <div className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto justify-end">
-                {currentQuestion.type === 'CODE' && (
+                {currentQuestion.type && currentQuestion.type.toLowerCase() === 'code' && (
                   <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200 truncate max-w-[100px] sm:max-w-none">
                     {LANGUAGE_OPTIONS.find(opt => opt.value === language)?.label || language}
                   </span>
@@ -1103,7 +1103,7 @@ function EvaluationContent() {
               </div>
             </CardTitle>
           </CardHeader>          <CardContent className="flex-grow p-3 sm:p-4 min-h-[300px] sm:min-h-[400px] h-full relative">
-            {currentQuestion.type === 'CODE' ? (
+            {currentQuestion.type && currentQuestion.type.toLowerCase() === 'code' ? (
               <CodeEditor
                   value={currentAnswer.answer}
                 onChange={handleAnswerChange}

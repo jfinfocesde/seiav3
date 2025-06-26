@@ -152,7 +152,6 @@ export async function createPregunta(evaluationId: number, data: { text: string;
     data: {
       evaluationId,
       ...data,
-      type: data.type.toUpperCase(),
     },
   });
 }
@@ -160,10 +159,7 @@ export async function createPregunta(evaluationId: number, data: { text: string;
 export async function updatePregunta(id: number, data: { text?: string; type?: string; language?: string; }) {
   return await prisma.question.update({
     where: { id },
-    data: {
-      ...data,
-      type: data.type ? data.type.toUpperCase() : undefined,
-    },
+    data,
   });
 }
 
