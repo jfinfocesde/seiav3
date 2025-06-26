@@ -20,7 +20,7 @@ export async function generateFraudReflection(
 ): Promise<FraudReflectionResult> {
   
   // const apiKey = await getApiKey(evaluationId);
-  const apiKey = await getApiKey(evaluationId + 4578);
+  const apiKey = await getApiKey(evaluationId);
   const genAI = new GoogleGenAI({ apiKey });
   const model = "gemini-2.0-flash";
   
