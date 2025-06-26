@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getAreas, getUsers } from "./actions";
 import { Suspense } from "react";
 import { UserManagementPanel } from "./UserManagementPanel";
