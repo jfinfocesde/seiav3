@@ -35,7 +35,7 @@ function normalizeQuestionType(type: string): 'TEXT' | 'CODE' {
 
 // Función para convertir el tipo de la UI a formato de BD
 function toDatabaseType(type: 'TEXT' | 'CODE'): string {
-  return type.toLowerCase();
+  return type === 'CODE' ? 'CODE' : 'TEXT';
 }
 
 export function QuestionsPanel({ evaluationId }: QuestionsPanelProps) {
