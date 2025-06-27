@@ -46,6 +46,8 @@ export function useFraudDetection({ submissionId, onFraudDetected, onTimeOutside
   const timeOutsideEvalRef = useRef(timeOutsideEval);
   const leaveTimeRef = useRef(leaveTime);
   const isHelpModalOpenRef = useRef(false);
+  // Ref para detectar interacción con el iframe de ayuda
+  const isInteractingWithHelpIframeRef = useRef(false);
 
   // Actualizar refs cuando cambian los estados
   useEffect(() => {
@@ -68,10 +70,23 @@ export function useFraudDetection({ submissionId, onFraudDetected, onTimeOutside
 
   // Función para registrar un intento de fraude
   const registerFraudAttempt = useCallback(async (reason: string) => {
+    // Si la ayuda está abierta y el blur/focus es causado por interacción con el iframe, ignorar
+    if (isHelpModalOpenRef.current && isInteractingWithHelpIframeRef.current) {
+      // Resetear el flag después de ignorar el evento
+      isInteractingWithHelpIframeRef.current = false;
+      return;
+    }
+
+    // Si la ayuda está abierta, solo ignorar eventos si el usuario NO ha salido de la pestaña
     if (isHelpModalOpenRef.current) {
-      // Si la ayuda está abierta, solo registrar leaveTime para contar tiempo fuera, pero no mostrar modal ni aumentar fraudes
-      const newLeaveTime = toUTC(new Date()).getTime();
-      setLeaveTime(newLeaveTime);
+      // Detectar si el evento es por cambio de pestaña o pérdida de foco real
+      if (reason === 'cambio de pestaña' || reason === 'pérdida de foco de ventana') {
+        // Si se sale de la pestaña o ventana, SÍ contar tiempo fuera
+        const newLeaveTime = toUTC(new Date()).getTime();
+        setLeaveTime(newLeaveTime);
+        return;
+      }
+      // Si es cualquier otro evento (teclas, copiar, etc), ignorar
       return;
     }
 
@@ -116,7 +131,19 @@ export function useFraudDetection({ submissionId, onFraudDetected, onTimeOutside
     };
 
     const handleWindowBlur = async () => {
-      registerFraudAttempt('pérdida de foco de ventana');
+      // Esperar un tick para que document.activeElement se actualice
+      setTimeout(() => {
+        // Si la ayuda está abierta y el foco fue al iframe de ayuda, ignorar el blur
+        if (isHelpModalOpenRef.current) {
+          const iframe = document.querySelector('iframe');
+          if (iframe && document.activeElement === iframe) {
+            // No contar tiempo fuera ni fraude
+            return;
+          }
+        }
+        // Si no, registrar intento de fraude normalmente
+        registerFraudAttempt('pérdida de foco de ventana');
+      }, 0);
     };
 
     const handleWindowFocus = async () => {
@@ -187,6 +214,17 @@ export function useFraudDetection({ submissionId, onFraudDetected, onTimeOutside
       };
     }
 
+    // Si existe el iframe de ayuda, agregar listeners para detectar interacción
+    const iframe = document.querySelector('iframe');
+    if (iframe) {
+      iframe.addEventListener('mousedown', () => {
+        isInteractingWithHelpIframeRef.current = true;
+      });
+      iframe.addEventListener('focus', () => {
+        isInteractingWithHelpIframeRef.current = true;
+      });
+    }
+
     // Detector de DevTools
     let devtoolsOpen = false;
     const threshold = 160;
@@ -219,6 +257,15 @@ export function useFraudDetection({ submissionId, onFraudDetected, onTimeOutside
         navigator.share = originalShare;
       }
 
+      if (iframe) {
+        iframe.removeEventListener('mousedown', () => {
+          isInteractingWithHelpIframeRef.current = true;
+        });
+        iframe.removeEventListener('focus', () => {
+          isInteractingWithHelpIframeRef.current = true;
+        });
+      }
+
       clearInterval(devtoolsInterval);
     };
   }, [submissionId, registerFraudAttempt, registerUserReturn]);
@@ -236,4 +283,4 @@ export function useFraudDetection({ submissionId, onFraudDetected, onTimeOutside
     isDevToolsModalOpen,
     setIsDevToolsModalOpen
   };
-} 
+}
