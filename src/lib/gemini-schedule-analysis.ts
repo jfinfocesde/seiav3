@@ -499,8 +499,7 @@ Responde ÚNICAMENTE en formato JSON válido, sin ningún texto antes o después
     model: model,
     contents: prompt,
   });
-  const text = response.text || '';
-  console.log('Respuesta de Gemini para análisis de sentimiento:', text);
+  const text = response.text || '';  
   try {
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
@@ -557,8 +556,7 @@ Responde ÚNICAMENTE en formato JSON válido, sin ningún texto antes o después
 `;
 
   const response = await genAI.models.generateContent({ model, contents: prompt });
-  const text = response.text || '';
-  console.log('Respuesta de Gemini para mapa de calor:', text);
+  const text = response.text || '';  
   try {
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
@@ -567,8 +565,7 @@ Responde ÚNICAMENTE en formato JSON válido, sin ningún texto antes o después
       throw new Error('No JSON object found in the response.');
     }
   } catch (error) {
-    console.error('Error processing Gemini JSON response for heatmap:', error);
-    console.error('Received text:', text);
+    console.error('Error processing Gemini JSON response for heatmap:', error);   
     throw new Error('Failed to parse difficulty heatmap from Gemini.');
   }
 } 

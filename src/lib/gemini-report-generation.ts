@@ -102,24 +102,19 @@ export async function generateEvaluationReport(
     });
     
     const text = response.text || '';
-    console.log('Respuesta de Gemini:', text);
-
+    
     // Extraer el JSON de la respuesta
     try {
       // Primero intentamos parsear directamente la respuesta
       try {
-        const reportResult = JSON.parse(text) as ReportResult;
-        console.log('JSON parseado directamente:', reportResult);
+        const reportResult = JSON.parse(text) as ReportResult;    
         return reportResult;
       } catch (directError) {
         console.log(directError);        
-        console.log('No se pudo parsear directamente, intentando extraer JSON de la respuesta');
-        
-        // Si falla, intentamos extraer el JSON usando regex
+                // Si falla, intentamos extraer el JSON usando regex
         const jsonMatch = text.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
-          const jsonText = jsonMatch[0];
-          console.log('JSON extraído con regex:', jsonText);
+          const jsonText = jsonMatch[0];         
           const reportResult = JSON.parse(jsonText) as ReportResult;
           return reportResult;
         } else {
@@ -127,8 +122,7 @@ export async function generateEvaluationReport(
         }
       }
     } catch (error) {
-      console.error('Error al procesar la respuesta JSON:', error);
-      console.error('Texto de respuesta recibido:', text);
+      console.error('Error al procesar la respuesta JSON:', error);     
     }
 
     // Si no se pudo extraer un JSON válido, devolver un reporte básico

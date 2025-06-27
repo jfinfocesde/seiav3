@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
-import { Home, FileText, Calendar, Settings, PanelLeftClose, Menu, PenTool } from 'lucide-react';
+import { Home, FileText, Calendar, Settings, PanelLeftClose, Menu, PenTool, Wrench } from 'lucide-react';
 import '@/app/globals.css';
 import { UserButton } from '@clerk/nextjs';
 
@@ -13,6 +13,7 @@ const navItems = [
   { href: '/teacher', label: 'Inicio', icon: Home },
   { href: '/teacher/evaluations', label: 'Evaluaciones', icon: FileText },
   { href: '/teacher/schedules', label: 'Horarios', icon: Calendar },
+  { href: '/teacher/tools', label: 'Herramientas', icon: Wrench },
 ];
 
 export function TeacherPanel({ children }: { children: React.ReactNode }) {

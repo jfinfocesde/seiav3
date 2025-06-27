@@ -51,11 +51,11 @@ export function EvaluationsTable({ evaluations, onEdit, onDelete, onQuestions, o
                     <Button variant="outline" size="sm" onClick={() => onEdit(ev)}>
                       Editar
                     </Button>
-                    <Button variant="destructive" size="sm" onClick={() => onDelete(ev.id)}>
-                      Eliminar
-                    </Button>
                     <Button variant="secondary" size="sm" onClick={() => onQuestions(ev.id)}>
                       Preguntas
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => onDelete(ev.id)}>
+                      Eliminar
                     </Button>
                   </div>
                 </td>

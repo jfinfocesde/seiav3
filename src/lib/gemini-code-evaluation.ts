@@ -61,10 +61,7 @@ export async function evaluateStudentCode(
       contents: prompt
     });
     
-    const text = response.text || '';
-
-    console.log('Respuesta de Gemini:', text);
-    
+    const text = response.text || '';    
 
     // Extraer el JSON de la respuesta
     const jsonMatch = text.match(/\{[\s\S]*\}/);

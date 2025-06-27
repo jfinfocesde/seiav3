@@ -30,7 +30,7 @@ export async function evaluateTextResponse(
 
     const apiKey = await getApiKey(evaluationId);
     const genAI = new GoogleGenAI({ apiKey });
-    
+
     // Usar el modelo gemini-2.0-flash para evaluaciones más rápidas
     const model = "gemini-2.0-flash";
 
@@ -62,10 +62,9 @@ export async function evaluateTextResponse(
       model: model,
       contents: prompt
     });
-    
+
     const text = response.text || '';
 
-     console.log('Respuesta de Gemini:', text);
 
     // Extraer el JSON de la respuesta
     const jsonMatch = text.match(/\{[\s\S]*\}/);

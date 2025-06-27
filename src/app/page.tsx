@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { SignInButton } from "@clerk/nextjs";
 
 
-import { Brain, BarChart3, Book, PenTool, LineChart, Clock, ArrowRight, Shield, GraduationCap, Code, CheckCircle } from "lucide-react";
+import {  Book, PenTool, LineChart, Clock, ArrowRight, Shield,  Code, CheckCircle } from "lucide-react";
 import ThemeToggle from "@/components/theme/ThemeToggle";
 import { CardStack } from "@/components/ui/card-stack";
 
@@ -67,7 +67,7 @@ export default function Home() {
         <div className="flex items-center gap-4">
           <SignInButton mode="modal">
             <Button variant="default" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105">
-              Iniciar Sesión
+              Ingreso para Administradores y Profesores
             </Button>
           </SignInButton>
           <ThemeToggle />
@@ -84,12 +84,14 @@ export default function Home() {
               Realiza tus <span className="text-primary glow-effect">Evaluaciones</span> en Línea
             </h1>
             <p className="text-lg text-muted-foreground max-w-xl">
-              Accede a tus evaluaciones de forma sencilla y recibe retroalimentación inmediata. Solo necesitas el código proporcionado por tu profesor.
+              SEIA es la plataforma integral para evaluaciones académicas. <br />
+              <span className="font-semibold text-primary">Estudiantes:</span> Acceden a sus evaluaciones con el código único proporcionado por su profesor, sin necesidad de registrarse.<br />
+              <span className="font-semibold text-primary">Profesores y Administradores:</span> Inician sesión para crear, gestionar y analizar evaluaciones, controlar intentos y obtener reportes detallados.
             </p>
             <div className="flex flex-wrap gap-4 pt-4">
               <Button size="lg" className="rounded-full px-8 blur-effect group" asChild>
                 <a href="/student" className="flex items-center gap-2">
-                  Comenzar Evaluación
+                  Ingreso para Estudiantes
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </a>
               </Button>
@@ -105,102 +107,90 @@ export default function Home() {
 
         <section className="py-16 bg-gradient-to-br from-muted/30 via-background/50 to-muted/30 rounded-3xl backdrop-blur-sm">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 glow-effect">Beneficios de SEIA</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 glow-effect">¿Qué puedes hacer con SEIA?</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Descubre por qué SEIA es la plataforma preferida para evaluaciones académicas
+              SEIA está diseñado para estudiantes, profesores y administradores. Descubre las ventajas para cada rol:
             </p>
           </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-            {[
-              {
-                icon: <Clock className="h-12 w-12 text-primary" />,
-                title: "Evaluaciones a Tu Ritmo",
-                description: "Realiza tus evaluaciones cuando mejor te convenga, sin presiones de tiempo innecesarias.",
-                color: "text-primary"
-              },
-              {
-                icon: <CheckCircle className="h-12 w-12 text-green-500" />,
-                title: "Resultados Inmediatos",
-                description: "Recibe tu calificación y retroalimentación detallada al instante, sin esperas.",
-                color: "text-green-500"
-              },
-              {
-                icon: <Brain className="h-12 w-12 text-purple-500" />,
-                title: "Retroalimentación IA",
-                description: "Análisis inteligente de tus respuestas con comentarios personalizados y constructivos.",
-                color: "text-purple-500"
-              },
-              {
-                icon: <BarChart3 className="h-12 w-12 text-blue-500" />,
-                title: "Análisis Detallado",
-                description: "Visualiza tu progreso con gráficos y estadísticas que te ayudan a identificar áreas de mejora.",
-                color: "text-blue-500"
-              },
-              {
-                icon: <Shield className="h-12 w-12 text-red-500" />,
-                title: "Ambiente Seguro",
-                description: "Plataforma protegida con medidas de seguridad avanzadas para garantizar la integridad de las evaluaciones.",
-                color: "text-red-500"
-              },
-              {
-                icon: <GraduationCap className="h-12 w-12 text-yellow-500" />,
-                title: "Apoyo Docente",
-                description: "Herramientas completas para que los docentes creen, administren y analicen evaluaciones eficientemente.",
-                color: "text-yellow-500"
-              }
-            ].map((benefit, index) => (
-              <div
-                key={index}
-                className="group relative p-6 bg-background/80 backdrop-blur-sm rounded-2xl border border-border/50 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 hover:scale-105"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <div className="relative z-10">
-                  <div className="flex items-center justify-center w-16 h-16 bg-background/50 rounded-xl border border-border/30 mb-4 group-hover:bg-background/80 transition-colors duration-300">
-                    {benefit.icon}
-                  </div>
-                  <h3 className={`text-xl font-bold mb-3 ${benefit.color}`}>{benefit.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{benefit.description}</p>
+            {/* Estudiantes */}
+            <div className="group relative p-6 bg-background/80 backdrop-blur-sm rounded-2xl border border-border/50 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 hover:scale-105">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative z-10">
+                <div className="flex items-center justify-center w-16 h-16 bg-background/50 rounded-xl border border-border/30 mb-4 group-hover:bg-background/80 transition-colors duration-300">
+                  <Clock className="h-12 w-12 text-primary" />
                 </div>
+                <h3 className="text-xl font-bold mb-3 text-primary">Para Estudiantes</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Accede a tus evaluaciones con un código único, responde en un entorno seguro y recibe retroalimentación inmediata y personalizada.
+                </p>
               </div>
-            ))}
+            </div>
+            {/* Profesores */}
+            <div className="group relative p-6 bg-background/80 backdrop-blur-sm rounded-2xl border border-border/50 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 hover:scale-105">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative z-10">
+                <div className="flex items-center justify-center w-16 h-16 bg-background/50 rounded-xl border border-border/30 mb-4 group-hover:bg-background/80 transition-colors duration-300">
+                  <PenTool className="h-12 w-12 text-blue-500" />
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-blue-500">Para Profesores</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Crea y programa evaluaciones, visualiza intentos, detecta comportamientos sospechosos y accede a reportes detallados del desempeño de tus estudiantes.
+                </p>
+              </div>
+            </div>
+            {/* Administradores */}
+            <div className="group relative p-6 bg-background/80 backdrop-blur-sm rounded-2xl border border-border/50 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 hover:scale-105">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative z-10">
+                <div className="flex items-center justify-center w-16 h-16 bg-background/50 rounded-xl border border-border/30 mb-4 group-hover:bg-background/80 transition-colors duration-300">
+                  <Shield className="h-12 w-12 text-red-500" />
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-red-500">Para Administradores</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Gestiona usuarios, áreas, límites y configuraciones globales. Supervisa la actividad del sistema y accede a auditorías y reportes globales.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
         <section className="py-16 fade-in">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Proceso de <span className="text-primary">Evaluación</span></h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">¿Cómo funciona SEIA?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-            {[
-              {
-                step: "01",
-                title: "Ingresa tu Código",
-                description: "Introduce el código único proporcionado por tu profesor para acceder a la evaluación.",
-                icon: <Code className="h-10 w-10 text-primary" />
-              },
-              {
-                step: "02",
-                title: "Realiza la Evaluación",
-                description: "Responde las preguntas con tranquilidad. El sistema guarda tu progreso automáticamente.",
-                icon: <PenTool className="h-10 w-10 text-blue-500" />
-              },
-              {
-                step: "03",
-                title: "Recibe tus Resultados",
-                description: "Obtén tu calificación y retroalimentación detallada al instante.",
-                icon: <CheckCircle className="h-10 w-10 text-green-500" />
-              }
-            ].map((step, index) => (
-              <div key={index} className="relative p-6 bg-background/50 backdrop-blur-sm rounded-xl border border-border/50 card-hover glow-effect">
-                <div className="absolute -top-4 -left-4 bg-primary text-primary-foreground w-10 h-10 rounded-full flex items-center justify-center font-bold">
-                  {step.step}
-                </div>
-                <div className="pt-6">
-                  {step.icon}
-                  <h3 className="text-xl font-bold mt-4 mb-2">{step.title}</h3>
-                  <p className="text-muted-foreground">{step.description}</p>
-                </div>
+            {/* Paso 1 */}
+            <div className="relative p-6 bg-background/50 backdrop-blur-sm rounded-xl border border-border/50 card-hover glow-effect">
+              <div className="absolute -top-4 -left-4 bg-primary text-primary-foreground w-10 h-10 rounded-full flex items-center justify-center font-bold">
+                01
               </div>
-            ))}
+              <div className="pt-6">
+                <Code className="h-10 w-10 text-primary" />
+                <h3 className="text-xl font-bold mt-4 mb-2">Estudiantes: Ingresa tu Código</h3>
+                <p className="text-muted-foreground">Introduce el código único proporcionado por tu profesor para acceder a la evaluación. No necesitas cuenta.</p>
+              </div>
+            </div>
+            {/* Paso 2 */}
+            <div className="relative p-6 bg-background/50 backdrop-blur-sm rounded-xl border border-border/50 card-hover glow-effect">
+              <div className="absolute -top-4 -left-4 bg-primary text-primary-foreground w-10 h-10 rounded-full flex items-center justify-center font-bold">
+                02
+              </div>
+              <div className="pt-6">
+                <PenTool className="h-10 w-10 text-blue-500" />
+                <h3 className="text-xl font-bold mt-4 mb-2">Profesores/Admins: Inician Sesión</h3>
+                <p className="text-muted-foreground">Acceden con su cuenta para crear, gestionar y analizar evaluaciones, así como administrar usuarios y áreas.</p>
+              </div>
+            </div>
+            {/* Paso 3 */}
+            <div className="relative p-6 bg-background/50 backdrop-blur-sm rounded-xl border border-border/50 card-hover glow-effect">
+              <div className="absolute -top-4 -left-4 bg-primary text-primary-foreground w-10 h-10 rounded-full flex items-center justify-center font-bold">
+                03
+              </div>
+              <div className="pt-6">
+                <CheckCircle className="h-10 w-10 text-green-500" />
+                <h3 className="text-xl font-bold mt-4 mb-2">Recibe Resultados y Reportes</h3>
+                <p className="text-muted-foreground">Los estudiantes obtienen retroalimentación inmediata. Profesores y admins acceden a reportes y análisis detallados.</p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -211,7 +201,7 @@ export default function Home() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center pt-4">
             <Button size="lg" className="rounded-full px-8 blur-effect" asChild>
-              <a href="/student">Comenzar Ahora</a>
+              <a href="/student">Ingreso para Estudiantes</a>
             </Button>
           </div>
         </section>
@@ -224,7 +214,7 @@ export default function Home() {
             <span className="font-bold text-xl">SEIA</span>
           </div>
           <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} Sistema de Evaluación Inteligente Académica. Todos los derechos reservados.
+            © {new Date().getFullYear()} Sistema de Evaluación con Inteligencia Artificial. Todos los derechos reservados.
           </p>
         </div>
       </footer>

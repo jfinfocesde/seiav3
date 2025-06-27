@@ -135,14 +135,16 @@ export function SchedulesTable({
                         <Button variant="outline" size="sm" onClick={() => onEdit(a)}>
                           Editar
                         </Button>
-                        <Button variant="destructive" size="sm" onClick={() => onDelete(a.id)}>
-                          Eliminar
-                        </Button>
                       </>
                     )}
                     <Button variant="secondary" size="sm" onClick={() => onSubmissions(a.id)}>
                       Envíos
                     </Button>
+                    {!isAdmin && (
+                      <Button variant="destructive" size="sm" onClick={() => onDelete(a.id)}>
+                        Eliminar
+                      </Button>
+                    )}
                   </div>
                 </td>
               </tr>

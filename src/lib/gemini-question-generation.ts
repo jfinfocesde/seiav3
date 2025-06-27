@@ -10,18 +10,13 @@ import { getApiKey } from './apiKeyService';
  * @returns The generated question as a Markdown string.
  */
 export async function generateQuestion(userPrompt: string, questionType: 'CODE' | 'TEXT', language?: string): Promise<string> {
-  try {
-    console.log('🔧 Iniciando generación de pregunta...');
-    console.log('📝 Parámetros:', { userPrompt, questionType, language });
-
+  try {    
     // Obtener la API Key dinámicamente
     const apiKey = await getApiKey();
     const genAI = new GoogleGenAI({ apiKey });
     
     // Usar el modelo gemini-2.0-flash 
-    const model = "gemini-2.0-flash";
-
-    console.log('🤖 Modelo:', model);
+    const model = "gemini-2.0-flash";   
 
     const typeInstruction = questionType === 'CODE' 
       ? `Genera una pregunta de programación. El lenguaje de programación es: ${language || 'desconocido'}. La pregunta debe pedir al estudiante que escriba una función o un fragmento de código. La descripción debe ser clara y concisa.`
@@ -75,28 +70,20 @@ export async function generateQuestion(userPrompt: string, questionType: 'CODE' 
       "IMPORTANTE: Genera directamente el contenido markdown sin envolverlo en ```markdown```",
       "Ahora genera la pregunta completa:"
     ].join('\\n');
-
-    console.log('📤 Enviando prompt a Gemini...');
-    console.log('📋 Prompt completo:', prompt);
-
+    
     // Generar la respuesta usando la nueva sintaxis de la API
     const response = await genAI.models.generateContent({
       model: model,
       contents: prompt
-    });
+    });      
     
-    console.log('📥 Respuesta recibida de Gemini:', response);
-    
-    const generatedText = response.text || '';
-
-    console.log('📄 Texto generado:', generatedText);
+    const generatedText = response.text || '';   
 
     if (!generatedText) {
       console.error('❌ No se recibió texto de la API');
       throw new Error("La API de Gemini no devolvió contenido.");
     }
-
-    console.log('✅ Pregunta generada exitosamente');
+   
     return generatedText.trim();
 
   } catch (error) {
@@ -125,9 +112,7 @@ export async function generateQuestionFromTemplate(
   language: string,
   existingQuestions: string[] = []
 ): Promise<string> {
-  try {
-    console.log('🔧 Iniciando generación de pregunta...');
-    console.log('📝 Parámetros:', { userPrompt, questionType, language });
+  try {    
 
     const apiKey = await getApiKey();
     const genAI = new GoogleGenAI({ apiKey });
@@ -146,14 +131,11 @@ export async function generateQuestionFromTemplate(
     }
 
     const prompt = `${promptContext}${existingQuestionsList}`;
-
-    console.log('📤 Enviando prompt a Gemini...');
+  
     const response = await genAI.models.generateContent({
       model: model,
       contents: [prompt]
     });
-
-    console.log('📥 Respuesta recibida de Gemini:', response);
 
     const generatedText = response.text || '';
     if (!generatedText) {

@@ -62,10 +62,8 @@ export function QuestionsPanel({ evaluationId }: QuestionsPanelProps) {
   };
 
   const handleSave = async (data: { text: string; type: 'TEXT' | 'CODE'; language?: string; }) => {
-    console.log('Guardando pregunta con datos:', data);
-    
-    const dbType = toDatabaseType(data.type);
-    console.log('Tipo convertido para BD:', dbType);
+        
+    const dbType = toDatabaseType(data.type); 
     
     if (editPregunta) {
       await updatePregunta(editPregunta.id, {
