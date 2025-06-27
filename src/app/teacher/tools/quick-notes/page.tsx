@@ -297,43 +297,61 @@ export default function QuickNotesPanel() {
                 {notes.map((note, idx) => (
                   <Card
                     key={idx}
-                    className="border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/60 text-yellow-900 dark:text-yellow-100 shadow-sm flex items-center"
+                    className="border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/60 text-yellow-900 dark:text-yellow-100 shadow-sm"
                   >
-                    <CardContent className="py-2 px-3 flex items-center gap-2">
-                      <StickyNote className="h-5 w-5 text-yellow-600 dark:text-yellow-300" />
-                      {editingIdx === idx ? (
-                        <textarea
-                          className="flex-1 border rounded px-2 py-1 bg-background text-foreground resize-none"
-                          value={editValue}
-                          onChange={handleEditChange}
-                          onBlur={() => handleEditSave(idx)}
-                          onKeyDown={e => handleEditKey(e, idx)}
-                          rows={2}
-                          autoFocus
-                        />
-                      ) : (
-                        <span className="flex-1 text-inherit break-words">{note}</span>
-                      )}
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button size="icon" variant="ghost" onClick={() => handleEdit(idx)} aria-label="Editar nota">
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Editar nota</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button size="icon" variant="ghost" onClick={() => handleDelete(idx)} aria-label="Eliminar nota">
-                              <Trash2 className="h-4 w-4 text-red-500" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Eliminar nota</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                    <CardContent className="px-3 flex flex-row items-center gap-3 w-full min-h-0">
+                      {/* Badge con número de nota */}
+                      <span className="flex items-center justify-center min-w-7 h-7 rounded-full bg-yellow-200 dark:bg-yellow-800 text-yellow-900 dark:text-yellow-100 font-bold text-sm self-center">
+                        {idx + 1}
+                      </span>
+                      {/* Contenido de la nota alineado a la izquierda y expandible */}
+                      <div className="flex-1 flex items-center min-w-0">
+                        {editingIdx === idx ? (
+                          <textarea
+                            className="flex-1 border rounded px-2 py-0 bg-background text-foreground resize-none min-h-0 max-h-40 overflow-auto text-left self-center w-full align-middle"
+                            value={editValue}
+                            onChange={handleEditChange}
+                            onBlur={() => handleEditSave(idx)}
+                            onKeyDown={e => handleEditKey(e, idx)}
+                            rows={1}
+                            autoFocus
+                            style={{height: 'auto', lineHeight: '1.5'}}
+                            ref={el => {
+                              if (el) {
+                                el.style.height = 'auto';
+                                el.style.height = el.scrollHeight + 'px';
+                              }
+                            }}
+                          />
+                        ) : (
+                          <span className="flex-1 text-inherit break-words text-left whitespace-pre-line self-center w-full align-middle leading-[1.5]">
+                            {note}
+                          </span>
+                        )}
+                      </div>
+                      {/* Iconos alineados horizontalmente a la derecha */}
+                      <div className="flex flex-row justify-end items-center gap-1 ml-2 self-center">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button size="icon" variant="ghost" onClick={() => handleEdit(idx)} aria-label="Editar nota">
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Editar nota</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button size="icon" variant="ghost" onClick={() => handleDelete(idx)} aria-label="Eliminar nota">
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Eliminar nota</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                     </CardContent>
                   </Card>
                 ))}
@@ -518,4 +536,4 @@ export default function QuickNotesPanel() {
       </div>
     </div>
   );
-} 
+}

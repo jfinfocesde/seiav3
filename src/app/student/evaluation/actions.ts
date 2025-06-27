@@ -527,7 +527,8 @@ export async function submitEvaluation(submissionId: number) {
       existingSubmission.attempt?.evaluation?.title || 'Evaluación',
       answerSummaries,
       scoreResult.averageScore || 0,
-      existingSubmission.fraudAttempts || 0
+      existingSubmission.fraudAttempts || 0,
+      existingSubmission.attempt?.evaluation?.id // Pasar evaluationId
     );
     
     // Codificar el reporte para pasarlo como parámetro URL

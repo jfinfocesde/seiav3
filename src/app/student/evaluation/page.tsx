@@ -417,20 +417,25 @@ function EvaluationContent() {
     try {
       const result = await submitEvaluation(submissionId);
       if (result.success) {
+        // Si hay encodedReport, redirigir a success con el reporte
+        if (result.encodedReport) {
+          router.push(`/student/success?report=${encodeURIComponent(result.encodedReport)}`);
+          return;
+        }
         setIsResultModalOpen(true);
         setEvaluationResult({
           success: true,
           message: 'Evaluación enviada correctamente',
           grade: typeof result.submission?.score === 'number' ? result.submission.score : undefined
         });
-        } else {
+      } else {
         setErrorMessage(result.error || 'Error al enviar la evaluación');
       }
     } catch (error) {
       console.error('Error al enviar la evaluación:', error);
       setErrorMessage('Error al enviar la evaluación');
     }
-  }, [evaluation, submissionId]);
+  }, [evaluation, submissionId, router]);
 
   // Referencia para la función de envío de evaluación para evitar dependencias circulares
   const handleSubmitEvaluationRef = useRef(handleSubmitEvaluation);
