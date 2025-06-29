@@ -43,6 +43,7 @@ export function QuestionsPanel({ evaluationId }: QuestionsPanelProps) {
   const [showForm, setShowForm] = useState(false);
   const [previewPregunta, setPreviewPregunta] = useState<Pregunta | null>(null);
   const [editPregunta, setEditPregunta] = useState<Pregunta | null>(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -92,11 +93,18 @@ export function QuestionsPanel({ evaluationId }: QuestionsPanelProps) {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm('Are you sure you want to delete this question?')) {
-      setPreguntas(preguntas.filter(p => p.id !== id));
-      deletePregunta(id);
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteId !== null) {
+      setPreguntas(preguntas.filter(p => p.id !== deleteId));
+      await deletePregunta(deleteId);
+      setDeleteId(null);
     }
   };
+
+  const cancelDelete = () => setDeleteId(null);
 
   return (
     <>
@@ -117,7 +125,9 @@ export function QuestionsPanel({ evaluationId }: QuestionsPanelProps) {
       ) : (
         <>
           <div className="mb-4">
-            <Button onClick={handleCreate}>Agregar pregunta</Button>
+            <Button onClick={handleCreate} disabled={preguntas.length >= 20}>
+              Agregar pregunta ({preguntas.length}/20)
+            </Button>
           </div>
           <ul className="space-y-2">
             {preguntas.map((p, idx) => (
@@ -158,6 +168,25 @@ export function QuestionsPanel({ evaluationId }: QuestionsPanelProps) {
                     )}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
+              </div>
+            </AlertDialogContent>
+          </AlertDialog>
+          {/* Modal de confirmación para eliminar pregunta */}
+          <AlertDialog open={deleteId !== null} onOpenChange={cancelDelete}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Eliminar pregunta</AlertDialogTitle>
+                <AlertDialogDescription>
+                  ¿Estás seguro de que deseas eliminar esta pregunta?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <div className="flex justify-end gap-2 mt-4">
+                <Button variant="outline" onClick={cancelDelete}>
+                  Cancelar
+                </Button>
+                <Button variant="destructive" onClick={confirmDelete}>
+                  Eliminar
+                </Button>
               </div>
             </AlertDialogContent>
           </AlertDialog>

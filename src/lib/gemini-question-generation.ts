@@ -155,3 +155,61 @@ export async function generateQuestionFromTemplate(
     throw new Error('No se pudo generar la pregunta. Por favor, inténtelo de nuevo.');
   }
 }
+
+/**
+ * Fixes the wording of a question using the Gemini API.
+ * @param question The question text to fix.
+ * @returns The fixed question as a string.
+ */
+export async function fixQuestionWording(question: string): Promise<string> {
+  try {
+    const apiKey = await getApiKey();
+    const genAI = new GoogleGenAI({ apiKey });
+    const model = "gemini-2.0-flash";
+    const prompt = [
+      "Corrige la redacción de la siguiente pregunta para que sea clara, precisa y esté bien escrita en español. No cambies el sentido de la pregunta. Devuelve solo la pregunta corregida, sin explicaciones ni comentarios.",
+      question
+    ].join('\n\n');
+    const response = await genAI.models.generateContent({
+      model,
+      contents: prompt
+    });
+    const corrected = response.text || '';
+    if (!corrected) {
+      throw new Error("La API de Gemini no devolvió contenido.");
+    }
+    return corrected.trim();
+  } catch (error) {
+    console.error("❌ Error al corregir la redacción de la pregunta con la API de Gemini:", error);
+    throw new Error("No se pudo corregir la redacción. Por favor, inténtelo de nuevo.");
+  }
+}
+
+/**
+ * Summarizes and optimizes a question to reduce token count while keeping its meaning.
+ * @param question The question text to summarize and optimize.
+ * @returns The summarized and optimized question as a string.
+ */
+export async function summarizeAndOptimizeQuestion(question: string): Promise<string> {
+  try {
+    const apiKey = await getApiKey();
+    const genAI = new GoogleGenAI({ apiKey });
+    const model = "gemini-2.0-flash";
+    const prompt = [
+      "Resume y optimiza la siguiente pregunta para que sea más breve y clara, reduciendo la cantidad de tokens pero manteniendo el mismo sentido. Devuelve solo la pregunta optimizada, sin explicaciones ni comentarios.",
+      question
+    ].join('\n\n');
+    const response = await genAI.models.generateContent({
+      model,
+      contents: prompt
+    });
+    const optimized = response.text || '';
+    if (!optimized) {
+      throw new Error("La API de Gemini no devolvió contenido.");
+    }
+    return optimized.trim();
+  } catch (error) {
+    console.error("❌ Error al resumir y optimizar la pregunta con la API de Gemini:", error);
+    throw new Error("No se pudo optimizar la pregunta. Por favor, inténtelo de nuevo.");
+  }
+}

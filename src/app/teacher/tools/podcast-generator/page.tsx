@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Download, Loader2 } from "lucide-react";
 import { generatePodcastAudioWithGemini, GEMINI_TTS_LANGUAGES, generatePodcastScriptWithGemini } from "@/lib/gemini-tts-service";
 import jsPDF from "jspdf";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 const GEMINI_VOICES = [
   "Kore", "Puck", "Charon", "Fenrir", "Leda", "Callirrhoe", "Aoede", "Enceladus", "Iapetus", "Algieba", "Algenib", "Rasalgethi", "Laomedeia", "Achernar", "Alnilam", "Schedar", "Gacrux", "Pulcherrima", "Achird", "Zubenelgenubi", "Vindemiatrix", "Sadachbia", "Sadaltager", "Sulafat", "Orus", "Autonoe", "Umbriel", "Erinome", "Despina"
@@ -126,31 +127,42 @@ export default function PodcastGeneratorPage() {
             <div className="flex-1 border rounded p-3 bg-background/60">
               <div className="font-semibold mb-2">{mode==='mono' ? 'Locutor' : 'Locutor 1'}</div>
               <Input className="mb-2" value={speaker1.name} onChange={e=>setSpeaker1(s=>({...s, name: e.target.value}))} placeholder="Nombre" />
-              <select className="w-full border rounded px-2 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 dark:bg-background dark:text-foreground" value={speaker1.voice} onChange={e=>setSpeaker1(s=>({...s, voice: e.target.value}))}>
-                {GEMINI_VOICES.map(v => <option key={v} value={v}>{v}</option>)}
-              </select>
+              <Select value={speaker1.voice} onValueChange={v => setSpeaker1(s => ({ ...s, voice: v }))}>
+                <SelectTrigger className="w-full border rounded px-2 py-2 bg-background text-foreground">
+                  <SelectValue placeholder="Voz" />
+                </SelectTrigger>
+                <SelectContent>
+                  {GEMINI_VOICES.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             {mode==='duo' && (
               <div className="flex-1 border rounded p-3 bg-background/60">
                 <div className="font-semibold mb-2">Locutor 2</div>
                 <Input className="mb-2" value={speaker2.name} onChange={e=>setSpeaker2(s=>({...s, name: e.target.value}))} placeholder="Nombre" />
-                <select className="w-full border rounded px-2 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 dark:bg-background dark:text-foreground" value={speaker2.voice} onChange={e=>setSpeaker2(s=>({...s, voice: e.target.value}))}>
-                  {GEMINI_VOICES.map(v => <option key={v} value={v}>{v}</option>)}
-                </select>
+                <Select value={speaker2.voice} onValueChange={v => setSpeaker2(s => ({ ...s, voice: v }))}>
+                  <SelectTrigger className="w-full border rounded px-2 py-2 bg-background text-foreground">
+                    <SelectValue placeholder="Voz" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {GEMINI_VOICES.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
             )}
             <div className="flex-1 flex flex-col gap-2 justify-between">
               <div>
                 <label className="block font-medium mb-1">Idioma</label>
-                <select
-                  className="w-full border rounded px-2 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 dark:bg-background dark:text-foreground"
-                  value={language}
-                  onChange={e => setLanguage(e.target.value as 'es'|'en')}
-                >
-                  {GEMINI_TTS_LANGUAGES.map(lang => (
-                    <option key={lang.code} value={lang.code}>{lang.label}</option>
-                  ))}
-                </select>
+                <Select value={language} onValueChange={v => setLanguage(v as 'es'|'en')}>
+                  <SelectTrigger className="w-full border rounded px-2 py-2 bg-background text-foreground">
+                    <SelectValue placeholder="Idioma" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {GEMINI_TTS_LANGUAGES.map(lang => (
+                      <SelectItem key={lang.code} value={lang.code}>{lang.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <Button onClick={handleGenerate} disabled={loading || !script.trim()} className="w-full gap-2 text-lg mt-4">
                 {loading ? <Loader2 className="animate-spin w-5 h-5" /> : 'Generar Podcast'}

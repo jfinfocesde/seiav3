@@ -5,7 +5,7 @@ export async function translateTextWithGemini(text: string, targetLang: string):
   const apiKey = await getApiKey();
   const ai = new GoogleGenAI({ apiKey });
   const model = "gemini-2.5-flash";
-  const prompt = `Traduce el siguiente texto al idioma ${targetLang} manteniendo el significado y el tono.\n\nTEXTO:\n${text}\n\nTraducción:`;
+  const prompt = `Traduce SOLO el siguiente texto al idioma ${targetLang}. Devuelve únicamente la traducción, sin explicaciones, sin prefijos, sin detalles.\n\n${text}`;
   const response = await ai.models.generateContent({
     model,
     contents: prompt

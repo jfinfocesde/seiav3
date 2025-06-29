@@ -3,6 +3,7 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+
 import { Upload, Volume2, Languages, Loader2, Mic, StopCircle } from "lucide-react";
 import { translateTextWithGemini, transcribeTranslateAndTTSWithGemini, generateSegmentedTTSWithGemini } from "@/lib/gemini-translate-service";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
@@ -15,7 +16,6 @@ export default function TranslatorPanel() {
   const [audioLoading, setAudioLoading] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [transcript, setTranscript] = useState("");
   const [includeTimestamps, setIncludeTimestamps] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [ttsVoice, setTtsVoice] = useState('Kore');
@@ -30,11 +30,33 @@ export default function TranslatorPanel() {
     setError("");
     setAudioUrl(null);
     try {
-      const res = await translateTextWithGemini(original, targetLang);
+      let res = await translateTextWithGemini(original, targetLang);
+      // Limpiar posibles explicaciones o prefijos
+      res = res.replace(/^(Traducción:|Translation:|Texto traducido:)/i, '').trim();
+      if (res.includes('\n')) {
+        const lines = res.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        res = lines.sort((a, b) => b.length - a.length)[0] || lines[lines.length - 1];
+      }
       setTranslated(res);
-      if (generateVoice && res) {
-        const audioBlob = await import("@/lib/gemini-translate-service").then(m => m.generateTTSWithGemini(res, targetLang, ttsVoice));
-        if (audioBlob) setAudioUrl(URL.createObjectURL(audioBlob));
+      if (generateVoice) {
+        if (!res) {
+          setError('No se pudo generar el audio: la traducción está vacía.');
+          console.error('TTS: Traducción vacía', { original, targetLang, res });
+          return;
+        }
+        try {
+          console.log('TTS: Generando audio', { texto: res, idioma: targetLang, voz: ttsVoice });
+          const audioBlob = await import("@/lib/gemini-translate-service").then(m => m.generateTTSWithGemini(res, targetLang, ttsVoice));
+          if (audioBlob) {
+            setAudioUrl(URL.createObjectURL(audioBlob));
+          } else {
+            setError('No se pudo generar el audio: respuesta vacía de Gemini TTS.');
+            console.error('TTS: Respuesta vacía', { texto: res, idioma: targetLang, voz: ttsVoice });
+          }
+        } catch (ttsErr) {
+          setError('Error al generar el audio traducido.');
+          console.error('TTS: Error al generar audio', ttsErr);
+        }
       }
     } catch {
       setError("Error al traducir el texto.");
@@ -56,7 +78,6 @@ export default function TranslatorPanel() {
           const base64 = (ev.target?.result as string).split(",")[1];
           // Llama a la función extendida para TTS
           const result = await transcribeTranslateAndTTSWithGemini(base64, targetLang, { timestamps: includeTimestamps, ttsVoice, returnAudio: false });
-          setTranscript(result.transcript);
           setOriginal(result.transcript);
           setTranslated(result.translation);
           // Si hay timestamps y el usuario lo pidió, generar TTS segmentado
@@ -106,7 +127,6 @@ export default function TranslatorPanel() {
           try {
             const base64 = (ev.target?.result as string).split(",")[1];
             const result = await transcribeTranslateAndTTSWithGemini(base64, targetLang, { timestamps: includeTimestamps, ttsVoice, returnAudio: false });
-            setTranscript(result.transcript);
             setOriginal(result.transcript);
             setTranslated(result.translation);
             let audioBlob: Blob | undefined = undefined;
@@ -186,37 +206,42 @@ export default function TranslatorPanel() {
                   </label>
                   <label className="flex items-center gap-1 text-xs cursor-pointer select-none ml-2">
                     <span>Voz:</span>
-                    <select value={ttsVoice} onChange={e => setTtsVoice(e.target.value)} disabled={audioLoading} className="border rounded px-1 py-0.5 text-xs">
-                      <option value="Kore">Kore</option>
-                      <option value="Puck">Puck</option>
-                      <option value="Zephyr">Zephyr</option>
-                      <option value="Charon">Charon</option>
-                      <option value="Fenrir">Fenrir</option>
-                      <option value="Leda">Leda</option>
-                      <option value="Orus">Orus</option>
-                      <option value="Aoede">Aoede</option>
-                      <option value="Callirrhoe">Callirrhoe</option>
-                      <option value="Autonoe">Autonoe</option>
-                      <option value="Enceladus">Enceladus</option>
-                      <option value="Iapetus">Iapetus</option>
-                      <option value="Umbriel">Umbriel</option>
-                      <option value="Algieba">Algieba</option>
-                      <option value="Despina">Despina</option>
-                      <option value="Erinome">Erinome</option>
-                      <option value="Algenib">Algenib</option>
-                      <option value="Laomedeia">Laomedeia</option>
-                      <option value="Achernar">Achernar</option>
-                      <option value="Alnilam">Alnilam</option>
-                      <option value="Schedar">Schedar</option>
-                      <option value="Gacrux">Gacrux</option>
-                      <option value="Pulcherrima">Pulcherrima</option>
-                      <option value="Achird">Achird</option>
-                      <option value="Zubenelgenubi">Zubenelgenubi</option>
-                      <option value="Vindemiatrix">Vindemiatrix</option>
-                      <option value="Sadachbia">Sadachbia</option>
-                      <option value="Sadaltager">Sadaltager</option>
-                      <option value="Sulafat">Sulafat</option>
-                    </select>
+                    <Select value={ttsVoice} onValueChange={setTtsVoice} disabled={audioLoading}>
+                      <SelectTrigger className="border rounded px-1 py-0.5 text-xs w-32">
+                        <SelectValue placeholder="Voz" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Kore">Kore</SelectItem>
+                        <SelectItem value="Puck">Puck</SelectItem>
+                        <SelectItem value="Zephyr">Zephyr</SelectItem>
+                        <SelectItem value="Charon">Charon</SelectItem>
+                        <SelectItem value="Fenrir">Fenrir</SelectItem>
+                        <SelectItem value="Leda">Leda</SelectItem>
+                        <SelectItem value="Orus">Orus</SelectItem>
+                        <SelectItem value="Aoede">Aoede</SelectItem>
+                        <SelectItem value="Callirrhoe">Callirrhoe</SelectItem>
+                        <SelectItem value="Autonoe">Autonoe</SelectItem>
+                        <SelectItem value="Enceladus">Enceladus</SelectItem>
+                        <SelectItem value="Iapetus">Iapetus</SelectItem>
+                        <SelectItem value="Umbriel">Umbriel</SelectItem>
+                        <SelectItem value="Algieba">Algieba</SelectItem>
+                        <SelectItem value="Despina">Despina</SelectItem>
+                        <SelectItem value="Erinome">Erinome</SelectItem>
+                        <SelectItem value="Algenib">Algenib</SelectItem>
+                        <SelectItem value="Laomedeia">Laomedeia</SelectItem>
+                        <SelectItem value="Achernar">Achernar</SelectItem>
+                        <SelectItem value="Alnilam">Alnilam</SelectItem>
+                        <SelectItem value="Schedar">Schedar</SelectItem>
+                        <SelectItem value="Gacrux">Gacrux</SelectItem>
+                        <SelectItem value="Pulcherrima">Pulcherrima</SelectItem>
+                        <SelectItem value="Achird">Achird</SelectItem>
+                        <SelectItem value="Zubenelgenubi">Zubenelgenubi</SelectItem>
+                        <SelectItem value="Vindemiatrix">Vindemiatrix</SelectItem>
+                        <SelectItem value="Sadachbia">Sadachbia</SelectItem>
+                        <SelectItem value="Sadaltager">Sadaltager</SelectItem>
+                        <SelectItem value="Sulafat">Sulafat</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </label>
                   {audioLoading && <Loader2 className="h-4 w-4 animate-spin ml-2" />}
                   {audioLoading && <span className="text-xs text-muted-foreground ml-2">Transcribiendo audio...</span>}
@@ -233,7 +258,6 @@ export default function TranslatorPanel() {
                 disabled={audioLoading || (mode === 'audio')}
               />
             </div>
-            {transcript && <div className="text-xs text-muted-foreground">Transcripción: {transcript}</div>}
           </CardContent>
         </Card>
         {/* Columna traducida */}
@@ -253,7 +277,7 @@ export default function TranslatorPanel() {
               {mode === 'texto' && (
                 <>
                   <Button onClick={handleTranslate} disabled={!original.trim() || loading || audioLoading} className="gap-2 ml-2">
-                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Volume2 className="h-4 w-4" />}
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : generateVoice ? <Volume2 className="h-4 w-4" /> : <Languages className="h-4 w-4" />}
                     Traducir
                   </Button>
                   <label className="flex items-center gap-1 text-xs cursor-pointer select-none ml-2">

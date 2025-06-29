@@ -55,19 +55,22 @@ export default function ToolsPanel() {
 			<h1 className="text-3xl font-bold mb-8">Herramientas para Profesores</h1>
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 				{tools.map((tool) => (
-					<Card key={tool.name} className="hover:shadow-xl transition-shadow">
-						<CardHeader className="flex flex-row items-center gap-4">
-							{tool.icon}
-							<div>
-								<CardTitle>{tool.name}</CardTitle>
-								<CardDescription>{tool.description}</CardDescription>
-							</div>
-						</CardHeader>
-						<CardContent>
-							<Button asChild className="w-full mt-2">
-								<Link href={tool.href}>Ir a {tool.name}</Link>
-							</Button>
-						</CardContent>
+					<Card key={tool.name} className="hover:shadow-xl transition-shadow h-full flex flex-col">
+						<div className="flex-1 flex flex-col">
+							<CardHeader className="flex flex-row items-center gap-4 pb-2">
+								{tool.icon}
+								<div>
+									<CardTitle>{tool.name}</CardTitle>
+									<CardDescription>{tool.description}</CardDescription>
+								</div>
+							</CardHeader>
+							<div className="flex-1" />
+							<CardContent className="flex flex-col justify-end">
+								<Button asChild className="w-full mt-2">
+									<Link href={tool.href}>Ir a {tool.name}</Link>
+								</Button>
+							</CardContent>
+						</div>
 					</Card>
 				))}
 			</div>

@@ -38,14 +38,17 @@ export function QuestionGenerationModal({
   const [questionType, setQuestionType] = useState('enunciado');
 
   // Opciones sugeridas solo sin opción múltiple
-  const questionTypeOptions = [
-    { value: 'enunciado', label: 'Enunciado' },
-    { value: 'analisis_codigo', label: 'Análisis de código' },
-    { value: 'completar_codigo', label: 'Completar código' },
-    { value: 'corregir_codigo', label: 'Corregir código' },
-    { value: 'analisis_texto', label: 'Análisis de texto' },
-    { value: 'resumir_texto', label: 'Resumir texto' }
-  ];
+  const questionTypeOptions = mainType === 'codigo'
+    ? [
+        { value: 'enunciado', label: 'Enunciado' },
+        { value: 'completar_codigo', label: 'Completar código' },
+        { value: 'corregir_codigo', label: 'Corregir código' }
+      ]
+    : [
+        { value: 'enunciado', label: 'Enunciado' },
+        { value: 'analisis_texto', label: 'Análisis de texto' },
+        { value: 'resumir_texto', label: 'Resumir texto' }
+      ];
 
   // Ejemplos para el placeholder según selección y lenguaje
   const placeholderExamples: Record<string, (lang?: string) => string> = {
