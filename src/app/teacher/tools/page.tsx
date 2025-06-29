@@ -34,9 +34,9 @@ const tools = [
 		href: '/teacher/tools/podcast-generator',
 	},
 	{
-		name: 'Generador de Lista de Cotejo',
+		name: 'Generador de Lista de Chequeo',
 		description:
-			'Crea listas de cotejo personalizadas para evaluar criterios de manera rápida y sencilla.',
+			'Crea listas de chequeo personalizadas para evaluar criterios de manera rápida y sencilla.',
 		icon: <FileText className="h-8 w-8 text-orange-500" />,
 		href: '/teacher/tools/checklist-generator',
 	},

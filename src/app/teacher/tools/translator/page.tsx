@@ -3,14 +3,14 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { Upload, Volume2, Languages, Loader2, Mic, StopCircle } from "lucide-react";
 import { translateTextWithGemini, transcribeTranslateAndTTSWithGemini, generateSegmentedTTSWithGemini } from "@/lib/gemini-translate-service";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 
 export default function TranslatorPanel() {
   const [original, setOriginal] = useState("");
   const [translated, setTranslated] = useState("");
-  const [targetLang, setTargetLang] = useState("inglés");
+  const [targetLang, setTargetLang] = useState<'es'|'en'>("en");
   const [loading, setLoading] = useState(false);
   const [audioLoading, setAudioLoading] = useState(false);
   const [error, setError] = useState("");
@@ -23,13 +23,19 @@ export default function TranslatorPanel() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const [mode, setMode] = useState<'texto' | 'audio'>('texto');
+  const [generateVoice, setGenerateVoice] = useState(false);
 
   const handleTranslate = async () => {
     setLoading(true);
     setError("");
+    setAudioUrl(null);
     try {
       const res = await translateTextWithGemini(original, targetLang);
       setTranslated(res);
+      if (generateVoice && res) {
+        const audioBlob = await import("@/lib/gemini-translate-service").then(m => m.generateTTSWithGemini(res, targetLang, ttsVoice));
+        if (audioBlob) setAudioUrl(URL.createObjectURL(audioBlob));
+      }
     } catch {
       setError("Error al traducir el texto.");
     } finally {
@@ -134,7 +140,7 @@ export default function TranslatorPanel() {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto py-8 px-2">
+    <div className="w-full max-w-full mx-auto py-8 px-2 md:px-8">
       <h1 className="text-2xl font-bold mb-4 flex items-center gap-2"><Languages className="w-7 h-7 text-primary" /> Traductor IA</h1>
       <div className="flex gap-4 mb-4">
         <Button variant={mode === 'texto' ? 'default' : 'outline'} onClick={() => setMode('texto')}>Traducción de texto</Button>
@@ -142,7 +148,7 @@ export default function TranslatorPanel() {
       </div>
       <div className="flex flex-col md:flex-row gap-4 w-full">
         {/* Columna original */}
-        <Card className="flex-1 min-w-[220px]">
+        <Card className="flex-1 min-w-[220px] min-h-[60vh] flex flex-col">
           <CardContent className="p-4 flex flex-col gap-2 h-full">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
               <span className="font-semibold">Texto original</span>
@@ -217,43 +223,60 @@ export default function TranslatorPanel() {
                 </>
               )}
             </div>
-            <Textarea
-              rows={8}
-              className="resize-y min-h-[80px]"
-              placeholder={mode === 'texto' ? "Escribe o pega el texto a traducir..." : "Aquí aparecerá la transcripción o escribe manualmente..."}
-              value={original}
-              onChange={e => setOriginal(e.target.value)}
-              disabled={audioLoading || (mode === 'audio')}
-            />
+            <div className="flex flex-col flex-grow">
+              <Textarea
+                rows={8}
+                className="resize-y min-h-[80px] flex-grow"
+                placeholder={mode === 'texto' ? "Escribe o pega el texto a traducir..." : "Aquí aparecerá la transcripción o escribe manualmente..."}
+                value={original}
+                onChange={e => setOriginal(e.target.value)}
+                disabled={audioLoading || (mode === 'audio')}
+              />
+            </div>
             {transcript && <div className="text-xs text-muted-foreground">Transcripción: {transcript}</div>}
           </CardContent>
         </Card>
         {/* Columna traducida */}
-        <Card className="flex-1 min-w-[220px]">
+        <Card className="flex-1 min-w-[220px] min-h-[60vh] flex flex-col">
           <CardContent className="p-4 flex flex-col gap-2 h-full">
             <div className="flex items-center gap-2 mb-2">
               <span className="font-semibold">Traducción</span>
-              <Input
-                className="w-32"
-                value={targetLang}
-                onChange={e => setTargetLang(e.target.value)}
-                placeholder="Idioma destino"
-                disabled={loading || audioLoading}
-              />
+              <Select value={targetLang} onValueChange={v => setTargetLang(v as 'es'|'en')} disabled={loading || audioLoading}>
+                <SelectTrigger className="w-32">
+                  <SelectValue placeholder="Idioma destino" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="es">Español</SelectItem>
+                  <SelectItem value="en">Inglés</SelectItem>
+                </SelectContent>
+              </Select>
               {mode === 'texto' && (
-                <Button onClick={handleTranslate} disabled={!original.trim() || loading || audioLoading} className="gap-2">
-                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Volume2 className="h-4 w-4" />}
-                  Traducir
-                </Button>
+                <>
+                  <Button onClick={handleTranslate} disabled={!original.trim() || loading || audioLoading} className="gap-2 ml-2">
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Volume2 className="h-4 w-4" />}
+                    Traducir
+                  </Button>
+                  <label className="flex items-center gap-1 text-xs cursor-pointer select-none ml-2">
+                    <input
+                      type="checkbox"
+                      checked={generateVoice}
+                      onChange={e => setGenerateVoice(e.target.checked)}
+                      disabled={loading || audioLoading}
+                    />
+                    Generar audio traducido
+                  </label>
+                </>
               )}
             </div>
-            <Textarea
-              rows={8}
-              className="resize-y min-h-[80px]"
-              placeholder="Aquí aparecerá la traducción..."
-              value={translated}
-              readOnly
-            />
+            <div className="flex flex-col flex-grow">
+              <Textarea
+                rows={8}
+                className="resize-y min-h-[80px] flex-grow"
+                placeholder="Aquí aparecerá la traducción..."
+                value={translated}
+                readOnly
+              />
+            </div>
             {audioUrl && (
               <audio controls className="mt-2 w-full">
                 <source src={audioUrl} type="audio/wav" />

@@ -108,7 +108,7 @@ export default function ChecklistTool() {
       headStyles: { fillColor: [41, 128, 185] },
       styles: { fontSize: 10 },
     });
-    doc.save("lista-cotejo.pdf");
+    doc.save("lista-chequeo.pdf");
   }
 
   function handleExportExcel() {
@@ -117,8 +117,8 @@ export default function ChecklistTool() {
       ...items.filter(Boolean).map((c, i) => [i + 1, c, "", ""])
     ]);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Lista de Cotejo");
-    XLSX.writeFile(wb, "lista-cotejo.xlsx");
+    XLSX.utils.book_append_sheet(wb, ws, "Lista de Chequeo");
+    XLSX.writeFile(wb, "lista-chequeo.xlsx");
   }
 
   function handleExportProject() {
@@ -168,7 +168,7 @@ export default function ChecklistTool() {
   return (
     <div className="w-full max-w-full px-0 md:px-0 py-8 mx-auto">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
-        <h1 className="text-2xl font-bold">📝 Generador de Lista de Cotejo</h1>
+        <h1 className="text-2xl font-bold">📝 Generador de Lista de Chequeo</h1>
         <div className="flex flex-row gap-2 mt-2 md:mt-0 items-center">
           <label className="inline-block">
             <input type="file" accept="application/json" className="hidden" onChange={handleImportProject} />
