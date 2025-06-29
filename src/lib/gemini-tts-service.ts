@@ -61,9 +61,7 @@ export async function generatePodcastAudioWithGemini({ script, mode, speakers, l
     if (lines.length !== filteredLines.length) {
       console.warn('Algunas líneas fueron ignoradas porque no empiezan con el nombre exacto del locutor:', lines.filter(l => !validLine(l)));
     }
-    normalizedScript = `TTS the following conversation between ${sp1} and ${sp2}:\n` + filteredLines.join('\n');
-    // DEBUG: Log final script y config
-    console.log('DEBUG Gemini TTS - Prompt final:', normalizedScript);
+    normalizedScript = filteredLines.join('\n'); // Solo el diálogo, sin instrucciones
   }
 
   let speechConfig: Record<string, unknown> = {};

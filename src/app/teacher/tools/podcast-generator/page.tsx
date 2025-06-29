@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Download, Loader2 } from "lucide-react";
 import { generatePodcastAudioWithGemini, GEMINI_TTS_LANGUAGES, generatePodcastScriptWithGemini } from "@/lib/gemini-tts-service";
+import jsPDF from "jspdf";
 
 const GEMINI_VOICES = [
   "Kore", "Puck", "Charon", "Fenrir", "Leda", "Callirrhoe", "Aoede", "Enceladus", "Iapetus", "Algieba", "Algenib", "Rasalgethi", "Laomedeia", "Achernar", "Alnilam", "Schedar", "Gacrux", "Pulcherrima", "Achird", "Zubenelgenubi", "Vindemiatrix", "Sadachbia", "Sadaltager", "Sulafat", "Orus", "Autonoe", "Umbriel", "Erinome", "Despina"
@@ -61,6 +62,23 @@ export default function PodcastGeneratorPage() {
     }
   }
 
+  function handleExportPDF() {
+    if (!script.trim()) return;
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text("Podcast generado por IA", 14, 18);
+    doc.setFontSize(12);
+    doc.text(`Tema: ${topic || "(sin tema)"}`, 14, 30);
+    doc.text(`Idioma: ${language === 'es' ? 'Español' : 'English'}`, 14, 38);
+    doc.text(`Modo: ${mode === 'mono' ? 'Monólogo' : 'Diálogo'}`, 14, 46);
+    doc.setFontSize(14);
+    doc.text("Guion:", 14, 58);
+    doc.setFontSize(11);
+    const lines = doc.splitTextToSize(script, 180);
+    doc.text(lines, 14, 66);
+    doc.save(`podcast_${topic ? topic.replace(/\s/g, '_') : 'guion'}.pdf`);
+  }
+
   return (
     <div className="w-full max-w-full mx-auto py-8 px-2 md:px-8">
       <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">🎙️ Generador de Podcast con IA</h1>
@@ -96,6 +114,11 @@ export default function PodcastGeneratorPage() {
             onChange={e => setScript(e.target.value)}
             rows={6}
           />
+          <div className="flex justify-start mt-2">
+            <Button variant="outline" className="gap-2" onClick={handleExportPDF} disabled={!script.trim()}>
+              <Download className="w-5 h-5" /> Descargar guion PDF
+            </Button>
+          </div>
         </div>
         {/* Right: Podcast Options, Locutor, Idioma, Playback */}
         <div className="flex-1 min-w-0 flex flex-col gap-4">
@@ -138,9 +161,11 @@ export default function PodcastGeneratorPage() {
           {audioUrl && (
             <div className="border rounded p-4 bg-background/80 flex flex-col items-center">
               <audio src={audioUrl} controls className="w-full mb-2" />
-              <Button asChild variant="outline" className="gap-2">
-                <a href={audioUrl} download="podcast.wav"><Download className="w-5 h-5" /> Descargar audio</a>
-              </Button>
+              <div className="flex gap-2">
+                <Button asChild variant="outline" className="gap-2">
+                  <a href={audioUrl} download="podcast.wav"><Download className="w-5 h-5" /> Descargar audio</a>
+                </Button>
+              </div>
             </div>
           )}
         </div>
