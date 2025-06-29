@@ -44,7 +44,9 @@ export function QuestionDesigner({ initialData, onSave, onCancel, onTextChange }
   const handleGenerate = async (prompt: string) => {
     setIsGenerating(true);
     try {
-      const generatedQuestion = await generateQuestion(prompt, type, language);
+      // Map internal type to expected values for generateQuestion
+      const mappedType = type === 'CODE' ? 'codigo' : 'texto';
+      const generatedQuestion = await generateQuestion(prompt, mappedType, language);
       setText(generatedQuestion);
       onTextChange(generatedQuestion);
       setIsModalOpen(false);
@@ -132,4 +134,4 @@ export function QuestionDesigner({ initialData, onSave, onCancel, onTextChange }
       />
     </div>
   );
-} 
+}

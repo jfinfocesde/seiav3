@@ -6,9 +6,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { evaluateStudentCode } from '@/lib/gemini-code-evaluation';
 import { evaluateTextResponse } from '@/lib/gemini-text-evaluation';
+import { generateAnswer } from '@/lib/gemini-answer-generation';
 
-const MarkdownViewer = dynamic(() => import('@/app/student/evaluation/components/markdown-viewer').then(mod => mod.MarkdownViewer), { ssr: false });
-const CodeEditor = dynamic(() => import('@/app/student/evaluation/components/code-editor').then(mod => mod.CodeEditor), { ssr: false });
+const MarkdownViewer = dynamic(() => import('./markdown-viewer').then(mod => mod.MarkdownViewer), { ssr: false });
+const CodeEditor = dynamic(() => import('./code-editor').then(mod => mod.CodeEditor), { ssr: false });
 
 const LANGUAGE_LABELS: Record<string, string> = {
   javascript: 'JavaScript',
@@ -38,6 +39,7 @@ export function TestQuestionPanel({ text, type, language }: TestQuestionPanelPro
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [result, setResult] = useState<null | { isCorrect: boolean; grade?: number; feedback: string }>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleEvaluate = async () => {
     setIsEvaluating(true);
@@ -55,6 +57,18 @@ export function TestQuestionPanel({ text, type, language }: TestQuestionPanelPro
       setModalOpen(true);
     } finally {
       setIsEvaluating(false);
+    }
+  };
+
+  const handleGenerateAnswer = async () => {
+    setIsGenerating(true);
+    try {
+      const generated = await generateAnswer(text, type === 'CODE' ? language : undefined);
+      setAnswer(generated);
+    } catch {
+      setAnswer('Error al generar la respuesta.');
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -94,6 +108,15 @@ export function TestQuestionPanel({ text, type, language }: TestQuestionPanelPro
               >
                 {isEvaluating ? 'Evaluando...' : 'Evaluar con Gemini'}
               </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={handleGenerateAnswer}
+                disabled={isGenerating}
+                className="h-10 sm:h-8 text-sm sm:text-base bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white font-medium shadow px-4 mr-2"
+              >
+                {isGenerating ? 'Generando...' : 'Generar respuesta IA'}
+              </Button>
             </div>
           </CardTitle>
         </CardHeader>
@@ -117,4 +140,4 @@ export function TestQuestionPanel({ text, type, language }: TestQuestionPanelPro
       <EvaluationResultModal isOpen={modalOpen} onClose={() => setModalOpen(false)} result={result} />
     </div>
   );
-} 
+}

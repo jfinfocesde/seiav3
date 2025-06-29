@@ -17,7 +17,7 @@ const tools = [
 		description:
 			'Sube un audio y obtén una evaluación detallada por marcas de tiempo según criterios personalizados.',
 		icon: <BarChart3 className="h-8 w-8 text-blue-500" />,
-		href: '/teacher/tools/performance-analyzer/audio',
+		href: '/teacher/tools/audio-analyzer',
 	},
 	{
 		name: 'Generador de Rúbricas Automáticas',
