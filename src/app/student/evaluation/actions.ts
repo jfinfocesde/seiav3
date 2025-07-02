@@ -4,7 +4,7 @@
 import { revalidatePath } from 'next/cache';
 import { nowUTC, isBeforeUTC, isAfterUTC } from '@/lib/date-utils';
 import { prisma } from '@/lib/prisma';
-import { cookies } from 'next/headers';
+import { cookies as nextCookies } from 'next/headers';
 import { randomUUID } from 'crypto';
 
 // Eliminar esta línea ya que ahora importamos prisma desde lib/prisma.ts
@@ -97,10 +97,11 @@ export async function getAttemptByUniqueCode(uniqueCode: string, email?: string)
 export async function createSubmission(attemptId: number, email: string, firstName: string, lastName: string) {
   try {
     // Obtener o generar deviceId desde cookie HttpOnly
-    let deviceId = cookies().get('deviceId')?.value;
+    const cookies = await nextCookies();
+    let deviceId = cookies.get('deviceId')?.value;
     if (!deviceId) {
       deviceId = randomUUID();
-      cookies().set('deviceId', deviceId, { httpOnly: true, sameSite: 'lax', path: '/', maxAge: 60 * 60 * 24 * 30 }); // 30 días
+      cookies.set('deviceId', deviceId, { httpOnly: true, sameSite: 'lax', path: '/', maxAge: 60 * 60 * 24 * 30 }); // 30 días
     }
     // Verificar si ya existe una submission para este intento y deviceId
     const existingByDevice = await prisma.submission.findFirst({

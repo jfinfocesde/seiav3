@@ -44,7 +44,6 @@ interface SubmissionsPanelProps {
 export function SubmissionsPanel({ attemptId, onBack }: SubmissionsPanelProps) {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [selectedSubmission, setSelectedSubmission] = useState<FullSubmission | null>(null);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
     getSubmissionsByAttempt(attemptId).then(data => setSubmissions(data as Submission[]));
@@ -90,10 +89,8 @@ export function SubmissionsPanel({ attemptId, onBack }: SubmissionsPanelProps) {
 
   const handleDelete = async (submissionId: number) => {
     if (!window.confirm('¿Estás seguro de que deseas eliminar esta presentación? El usuario podrá volver a ingresar a la evaluación.')) return;
-    setDeletingId(submissionId);
     await deleteSubmission(submissionId);
     setSubmissions(submissions => submissions.filter(s => s.id !== submissionId));
-    setDeletingId(null);
   };
 
   if (selectedSubmission) {
