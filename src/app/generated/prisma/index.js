@@ -212,7 +212,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\jhonf\\Desktop\\Info\\ProyectosActuales\\clone\\V2\\seiac6\\src\\app\\generated\\prisma",
+      "value": "C:\\Users\\jhonf\\Desktop\\Info\\ProyectosActuales\\clone\\V2\\seiac4\\src\\app\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -226,7 +226,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\jhonf\\Desktop\\Info\\ProyectosActuales\\clone\\V2\\seiac6\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\jhonf\\Desktop\\Info\\ProyectosActuales\\clone\\V2\\seiac4\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
