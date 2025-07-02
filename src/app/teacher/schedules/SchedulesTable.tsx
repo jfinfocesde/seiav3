@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Copy, Check, BarChart3, FileText, List, Sparkles } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useUser } from '@clerk/nextjs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 interface Attempt {
   id: number;
@@ -44,11 +45,31 @@ export function SchedulesTable({
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const { user } = useUser();
   const isAdmin = user?.publicMetadata?.role === 'ADMIN';
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
 
   const handleCopy = (code: string) => {
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000); // Reset after 2 seconds
+  };
+
+  const handleDeleteClick = (id: number) => {
+    setPendingDeleteId(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (pendingDeleteId !== null) {
+      onDelete(pendingDeleteId);
+      setPendingDeleteId(null);
+      setDeleteDialogOpen(false);
+    }
+  };
+
+  const cancelDelete = () => {
+    setPendingDeleteId(null);
+    setDeleteDialogOpen(false);
   };
 
   return (
@@ -135,14 +156,16 @@ export function SchedulesTable({
                         <Button variant="outline" size="sm" onClick={() => onEdit(a)}>
                           Editar
                         </Button>
-                        <Button variant="destructive" size="sm" onClick={() => onDelete(a.id)}>
-                          Eliminar
-                        </Button>
                       </>
                     )}
                     <Button variant="secondary" size="sm" onClick={() => onSubmissions(a.id)}>
                       Envíos
                     </Button>
+                    {!isAdmin && (
+                      <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(a.id)}>
+                        Eliminar
+                      </Button>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -150,6 +173,20 @@ export function SchedulesTable({
           </tbody>
         </table>
       </div>
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar eliminación</DialogTitle>
+            <DialogDescription>
+              ¿Estás seguro de que deseas eliminar esta presentación? Esta acción no se puede deshacer.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="secondary" onClick={cancelDelete}>Cancelar</Button>
+            <Button variant="destructive" onClick={confirmDelete}>Eliminar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </TooltipProvider>
   );
-} 
+}

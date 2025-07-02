@@ -80,15 +80,19 @@ export default function StudentEntryPage() {
     setLoading(true)
     
     try {
-      // En una implementación real, aquí verificaríamos que el código sea válido
-      // y crearíamos una nueva submission en la base de datos
-      
       // Convertimos nombre y apellido a mayúsculas
       const firstNameUpper = firstName.toUpperCase();
       const lastNameUpper = lastName.toUpperCase();
-      
-      // Redirigimos a la página de evaluación con todos los datos del estudiante
-      router.push(`/student/evaluation?code=${uniqueCode}&email=${encodeURIComponent(email)}&firstName=${encodeURIComponent(firstNameUpper)}&lastName=${encodeURIComponent(lastNameUpper)}`)
+      // Guardar los datos personales en sessionStorage
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('studentData', JSON.stringify({
+          email,
+          firstName: firstNameUpper,
+          lastName: lastNameUpper,
+        }));
+      }
+      // Redirigir solo con el código en la URL
+      router.push(`/student/evaluation?code=${uniqueCode}`);
     } catch (error) {
       console.error('Error al iniciar la evaluación:', error)
       console.error('Error al iniciar la evaluación. Por favor, intenta de nuevo.')

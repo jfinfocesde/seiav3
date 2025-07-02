@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { getEvaluaciones } from '../evaluations/actions';
 import { RotateCw } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 interface Evaluation {
   id: number;
@@ -33,7 +34,7 @@ function generateCode(length = 8) {
 
 export function ScheduleForm({ onSave, onCancel, initialData }: ScheduleFormProps) {
   const [evaluations, setEvaluations] = useState<Evaluation[]>([]);
-  const [evaluationId, setEvaluationId] = useState(initialData?.evaluationId || '');
+  const [evaluationId, setEvaluationId] = useState(initialData?.evaluationId ? String(initialData.evaluationId) : '');
   const [uniqueCode, setUniqueCode] = useState(initialData?.uniqueCode || (!initialData ? generateCode() : ''));
   const [startTime, setStartTime] = useState(initialData?.startTime || '');
   const [endTime, setEndTime] = useState(initialData?.endTime || '');
@@ -60,12 +61,16 @@ export function ScheduleForm({ onSave, onCancel, initialData }: ScheduleFormProp
     >
       <div>
         <label className="block mb-1 font-medium">Evaluación</label>
-        <select value={evaluationId} onChange={e => setEvaluationId(e.target.value)} required className="w-full border rounded p-2">
-          <option value="">Selecciona una evaluación</option>
-          {evaluations.map(ev => (
-            <option key={ev.id} value={ev.id}>{ev.title}</option>
-          ))}
-        </select>
+        <Select value={evaluationId} onValueChange={v => setEvaluationId(String(v))} required>
+          <SelectTrigger className="w-full border rounded p-2">
+            <SelectValue placeholder="Selecciona una evaluación" />
+          </SelectTrigger>
+          <SelectContent>
+            {evaluations.map(ev => (
+              <SelectItem key={ev.id} value={String(ev.id)}>{ev.title}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       <div>
         <label className="block mb-1 font-medium">Código único</label>

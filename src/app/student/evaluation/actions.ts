@@ -4,6 +4,8 @@
 import { revalidatePath } from 'next/cache';
 import { nowUTC, isBeforeUTC, isAfterUTC } from '@/lib/date-utils';
 import { prisma } from '@/lib/prisma';
+import { cookies } from 'next/headers';
+import { randomUUID } from 'crypto';
 
 // Eliminar esta línea ya que ahora importamos prisma desde lib/prisma.ts
 // const prisma = new PrismaClient();
@@ -94,37 +96,60 @@ export async function getAttemptByUniqueCode(uniqueCode: string, email?: string)
  */
 export async function createSubmission(attemptId: number, email: string, firstName: string, lastName: string) {
   try {
-    // Primero verificamos si ya existe una presentación para este estudiante en este intento usando el email
-    const existingSubmission = await prisma.submission.findFirst({
+    // Obtener o generar deviceId desde cookie HttpOnly
+    let deviceId = cookies().get('deviceId')?.value;
+    if (!deviceId) {
+      deviceId = randomUUID();
+      cookies().set('deviceId', deviceId, { httpOnly: true, sameSite: 'lax', path: '/', maxAge: 60 * 60 * 24 * 30 }); // 30 días
+    }
+    // Verificar si ya existe una submission para este intento y deviceId
+    const existingByDevice = await prisma.submission.findFirst({
       where: {
         attemptId,
-        email,
+        deviceId,
       },
       orderBy: {
         createdAt: 'desc'
       }
     });
-
-    // Si ya existe una presentación, verificamos si ya fue enviada (submittedAt no es null)
-    if (existingSubmission) {
-      // Si submittedAt no es null, significa que la evaluación ya fue enviada
-      if (existingSubmission.submittedAt !== null) {
-        return { 
-          success: false, 
-          error: 'Esta evaluación ya fue enviada anteriormente. No es posible presentarla nuevamente.'
+    if (existingByDevice) {
+      // Si ya existe una submission para este deviceId, devolverla
+      if (existingByDevice.submittedAt !== null) {
+        return {
+          success: false,
+          error: 'Esta evaluación ya fue enviada desde este dispositivo.'
         };
       }
-      return { success: true, submission: existingSubmission };
+      return { success: true, submission: existingByDevice };
+    }
+
+    // Verificar si ya existe una submission para este intento y email (pero con otro deviceId)
+    const existingByEmail = await prisma.submission.findFirst({
+      where: {
+        attemptId,
+        email,
+        deviceId: { not: deviceId },
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+    if (existingByEmail) {
+      // Si ya existe una submission para este email pero con otro deviceId, rechazar
+      return {
+        success: false,
+        error: 'No puedes abrir la evaluación desde otro dispositivo o navegador. Debes continuar en el mismo lugar donde la iniciaste.'
+      };
     }
 
     // Si no existe, creamos una nueva presentación
     const submission = await prisma.submission.create({
       data: {
         attemptId,
-        // Eliminamos la referencia a studentName en el objeto de creación
         firstName,
         lastName,
         email,
+        deviceId,
         submittedAt: null // Se actualizará cuando se envíe completamente
       }
     });
@@ -527,7 +552,8 @@ export async function submitEvaluation(submissionId: number) {
       existingSubmission.attempt?.evaluation?.title || 'Evaluación',
       answerSummaries,
       scoreResult.averageScore || 0,
-      existingSubmission.fraudAttempts || 0
+      existingSubmission.fraudAttempts || 0,
+      existingSubmission.attempt?.evaluation?.id // Pasar evaluationId
     );
     
     // Codificar el reporte para pasarlo como parámetro URL

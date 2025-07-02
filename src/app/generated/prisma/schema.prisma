@@ -92,6 +92,7 @@ model Submission {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   answersList     Answer[]  @relation("SubmissionAnswers")
+  deviceId        String? // Identificador único de dispositivo/sesión
 }
 
 // Modelo para Respuesta (Answer)

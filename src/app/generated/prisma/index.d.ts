@@ -7529,6 +7529,7 @@ export namespace Prisma {
     submittedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
+    deviceId: string | null
   }
 
   export type SubmissionMaxAggregateOutputType = {
@@ -7543,6 +7544,7 @@ export namespace Prisma {
     submittedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
+    deviceId: string | null
   }
 
   export type SubmissionCountAggregateOutputType = {
@@ -7557,6 +7559,7 @@ export namespace Prisma {
     submittedAt: number
     createdAt: number
     updatedAt: number
+    deviceId: number
     _all: number
   }
 
@@ -7589,6 +7592,7 @@ export namespace Prisma {
     submittedAt?: true
     createdAt?: true
     updatedAt?: true
+    deviceId?: true
   }
 
   export type SubmissionMaxAggregateInputType = {
@@ -7603,6 +7607,7 @@ export namespace Prisma {
     submittedAt?: true
     createdAt?: true
     updatedAt?: true
+    deviceId?: true
   }
 
   export type SubmissionCountAggregateInputType = {
@@ -7617,6 +7622,7 @@ export namespace Prisma {
     submittedAt?: true
     createdAt?: true
     updatedAt?: true
+    deviceId?: true
     _all?: true
   }
 
@@ -7718,6 +7724,7 @@ export namespace Prisma {
     submittedAt: Date | null
     createdAt: Date
     updatedAt: Date
+    deviceId: string | null
     _count: SubmissionCountAggregateOutputType | null
     _avg: SubmissionAvgAggregateOutputType | null
     _sum: SubmissionSumAggregateOutputType | null
@@ -7751,6 +7758,7 @@ export namespace Prisma {
     submittedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    deviceId?: boolean
     attempt?: boolean | AttemptDefaultArgs<ExtArgs>
     answersList?: boolean | Submission$answersListArgs<ExtArgs>
     _count?: boolean | SubmissionCountOutputTypeDefaultArgs<ExtArgs>
@@ -7768,6 +7776,7 @@ export namespace Prisma {
     submittedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    deviceId?: boolean
     attempt?: boolean | AttemptDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["submission"]>
 
@@ -7783,6 +7792,7 @@ export namespace Prisma {
     submittedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    deviceId?: boolean
     attempt?: boolean | AttemptDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["submission"]>
 
@@ -7798,9 +7808,10 @@ export namespace Prisma {
     submittedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    deviceId?: boolean
   }
 
-  export type SubmissionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "attemptId" | "firstName" | "lastName" | "email" | "score" | "fraudAttempts" | "timeOutsideEval" | "submittedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["submission"]>
+  export type SubmissionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "attemptId" | "firstName" | "lastName" | "email" | "score" | "fraudAttempts" | "timeOutsideEval" | "submittedAt" | "createdAt" | "updatedAt" | "deviceId", ExtArgs["result"]["submission"]>
   export type SubmissionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     attempt?: boolean | AttemptDefaultArgs<ExtArgs>
     answersList?: boolean | Submission$answersListArgs<ExtArgs>
@@ -7831,6 +7842,7 @@ export namespace Prisma {
       submittedAt: Date | null
       createdAt: Date
       updatedAt: Date
+      deviceId: string | null
     }, ExtArgs["result"]["submission"]>
     composites: {}
   }
@@ -8267,6 +8279,7 @@ export namespace Prisma {
     readonly submittedAt: FieldRef<"Submission", 'DateTime'>
     readonly createdAt: FieldRef<"Submission", 'DateTime'>
     readonly updatedAt: FieldRef<"Submission", 'DateTime'>
+    readonly deviceId: FieldRef<"Submission", 'String'>
   }
     
 
@@ -10949,7 +10962,8 @@ export namespace Prisma {
     timeOutsideEval: 'timeOutsideEval',
     submittedAt: 'submittedAt',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    deviceId: 'deviceId'
   };
 
   export type SubmissionScalarFieldEnum = (typeof SubmissionScalarFieldEnum)[keyof typeof SubmissionScalarFieldEnum]
@@ -11438,6 +11452,7 @@ export namespace Prisma {
     submittedAt?: DateTimeNullableFilter<"Submission"> | Date | string | null
     createdAt?: DateTimeFilter<"Submission"> | Date | string
     updatedAt?: DateTimeFilter<"Submission"> | Date | string
+    deviceId?: StringNullableFilter<"Submission"> | string | null
     attempt?: XOR<AttemptScalarRelationFilter, AttemptWhereInput>
     answersList?: AnswerListRelationFilter
   }
@@ -11454,6 +11469,7 @@ export namespace Prisma {
     submittedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    deviceId?: SortOrderInput | SortOrder
     attempt?: AttemptOrderByWithRelationInput
     answersList?: AnswerOrderByRelationAggregateInput
   }
@@ -11473,6 +11489,7 @@ export namespace Prisma {
     submittedAt?: DateTimeNullableFilter<"Submission"> | Date | string | null
     createdAt?: DateTimeFilter<"Submission"> | Date | string
     updatedAt?: DateTimeFilter<"Submission"> | Date | string
+    deviceId?: StringNullableFilter<"Submission"> | string | null
     attempt?: XOR<AttemptScalarRelationFilter, AttemptWhereInput>
     answersList?: AnswerListRelationFilter
   }, "id">
@@ -11489,6 +11506,7 @@ export namespace Prisma {
     submittedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    deviceId?: SortOrderInput | SortOrder
     _count?: SubmissionCountOrderByAggregateInput
     _avg?: SubmissionAvgOrderByAggregateInput
     _max?: SubmissionMaxOrderByAggregateInput
@@ -11511,6 +11529,7 @@ export namespace Prisma {
     submittedAt?: DateTimeNullableWithAggregatesFilter<"Submission"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Submission"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Submission"> | Date | string
+    deviceId?: StringNullableWithAggregatesFilter<"Submission"> | string | null
   }
 
   export type AnswerWhereInput = {
@@ -11997,6 +12016,7 @@ export namespace Prisma {
     submittedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    deviceId?: string | null
     attempt: AttemptCreateNestedOneWithoutSubmissionsInput
     answersList?: AnswerCreateNestedManyWithoutSubmissionInput
   }
@@ -12013,6 +12033,7 @@ export namespace Prisma {
     submittedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    deviceId?: string | null
     answersList?: AnswerUncheckedCreateNestedManyWithoutSubmissionInput
   }
 
@@ -12026,6 +12047,7 @@ export namespace Prisma {
     submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deviceId?: NullableStringFieldUpdateOperationsInput | string | null
     attempt?: AttemptUpdateOneRequiredWithoutSubmissionsNestedInput
     answersList?: AnswerUpdateManyWithoutSubmissionNestedInput
   }
@@ -12042,6 +12064,7 @@ export namespace Prisma {
     submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deviceId?: NullableStringFieldUpdateOperationsInput | string | null
     answersList?: AnswerUncheckedUpdateManyWithoutSubmissionNestedInput
   }
 
@@ -12057,6 +12080,7 @@ export namespace Prisma {
     submittedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    deviceId?: string | null
   }
 
   export type SubmissionUpdateManyMutationInput = {
@@ -12069,6 +12093,7 @@ export namespace Prisma {
     submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deviceId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type SubmissionUncheckedUpdateManyInput = {
@@ -12083,6 +12108,7 @@ export namespace Prisma {
     submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deviceId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AnswerCreateInput = {
@@ -12673,6 +12699,7 @@ export namespace Prisma {
     submittedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    deviceId?: SortOrder
   }
 
   export type SubmissionAvgOrderByAggregateInput = {
@@ -12695,6 +12722,7 @@ export namespace Prisma {
     submittedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    deviceId?: SortOrder
   }
 
   export type SubmissionMinOrderByAggregateInput = {
@@ -12709,6 +12737,7 @@ export namespace Prisma {
     submittedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    deviceId?: SortOrder
   }
 
   export type SubmissionSumOrderByAggregateInput = {
@@ -13994,6 +14023,7 @@ export namespace Prisma {
     submittedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    deviceId?: string | null
     answersList?: AnswerCreateNestedManyWithoutSubmissionInput
   }
 
@@ -14008,6 +14038,7 @@ export namespace Prisma {
     submittedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    deviceId?: string | null
     answersList?: AnswerUncheckedCreateNestedManyWithoutSubmissionInput
   }
 
@@ -14084,6 +14115,7 @@ export namespace Prisma {
     submittedAt?: DateTimeNullableFilter<"Submission"> | Date | string | null
     createdAt?: DateTimeFilter<"Submission"> | Date | string
     updatedAt?: DateTimeFilter<"Submission"> | Date | string
+    deviceId?: StringNullableFilter<"Submission"> | string | null
   }
 
   export type AttemptCreateWithoutSubmissionsInput = {
@@ -14193,6 +14225,7 @@ export namespace Prisma {
     submittedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    deviceId?: string | null
     attempt: AttemptCreateNestedOneWithoutSubmissionsInput
   }
 
@@ -14208,6 +14241,7 @@ export namespace Prisma {
     submittedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    deviceId?: string | null
   }
 
   export type SubmissionCreateOrConnectWithoutAnswersListInput = {
@@ -14260,6 +14294,7 @@ export namespace Prisma {
     submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deviceId?: NullableStringFieldUpdateOperationsInput | string | null
     attempt?: AttemptUpdateOneRequiredWithoutSubmissionsNestedInput
   }
 
@@ -14275,6 +14310,7 @@ export namespace Prisma {
     submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deviceId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type QuestionUpsertWithoutAnswersInput = {
@@ -14523,6 +14559,7 @@ export namespace Prisma {
     submittedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    deviceId?: string | null
   }
 
   export type SubmissionUpdateWithoutAttemptInput = {
@@ -14535,6 +14572,7 @@ export namespace Prisma {
     submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deviceId?: NullableStringFieldUpdateOperationsInput | string | null
     answersList?: AnswerUpdateManyWithoutSubmissionNestedInput
   }
 
@@ -14549,6 +14587,7 @@ export namespace Prisma {
     submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deviceId?: NullableStringFieldUpdateOperationsInput | string | null
     answersList?: AnswerUncheckedUpdateManyWithoutSubmissionNestedInput
   }
 
@@ -14563,6 +14602,7 @@ export namespace Prisma {
     submittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deviceId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AnswerCreateManySubmissionInput = {

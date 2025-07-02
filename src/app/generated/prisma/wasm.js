@@ -181,7 +181,8 @@ exports.Prisma.SubmissionScalarFieldEnum = {
   timeOutsideEval: 'timeOutsideEval',
   submittedAt: 'submittedAt',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  deviceId: 'deviceId'
 };
 
 exports.Prisma.AnswerScalarFieldEnum = {

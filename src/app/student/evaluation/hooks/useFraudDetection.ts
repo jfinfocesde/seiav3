@@ -39,13 +39,15 @@ export function useFraudDetection({ submissionId, onFraudDetected, onTimeOutside
   const [isFraudModalOpen, setIsFraudModalOpen] = useState(false);
   const [currentFraudType, setCurrentFraudType] = useState('');
   const [currentFraudMessage, setCurrentFraudMessage] = useState('');
-  const [isDevToolsModalOpen, setIsDevToolsModalOpen] = useState(false);
+  // Eliminar estado y setters de DevTools Modal
 
   // Refs para mantener los valores actualizados en los event listeners
   const fraudAttemptsRef = useRef(fraudAttempts);
   const timeOutsideEvalRef = useRef(timeOutsideEval);
   const leaveTimeRef = useRef(leaveTime);
   const isHelpModalOpenRef = useRef(false);
+  // Ref para detectar interacción con el iframe de ayuda
+  const isInteractingWithHelpIframeRef = useRef(false);
 
   // Actualizar refs cuando cambian los estados
   useEffect(() => {
@@ -68,10 +70,23 @@ export function useFraudDetection({ submissionId, onFraudDetected, onTimeOutside
 
   // Función para registrar un intento de fraude
   const registerFraudAttempt = useCallback(async (reason: string) => {
+    // Si la ayuda está abierta y el blur/focus es causado por interacción con el iframe, ignorar
+    if (isHelpModalOpenRef.current && isInteractingWithHelpIframeRef.current) {
+      // Resetear el flag después de ignorar el evento
+      isInteractingWithHelpIframeRef.current = false;
+      return;
+    }
+
+    // Si la ayuda está abierta, solo ignorar eventos si el usuario NO ha salido de la pestaña
     if (isHelpModalOpenRef.current) {
-      // Si la ayuda está abierta, solo registrar leaveTime para contar tiempo fuera, pero no mostrar modal ni aumentar fraudes
-      const newLeaveTime = toUTC(new Date()).getTime();
-      setLeaveTime(newLeaveTime);
+      // Detectar si el evento es por cambio de pestaña o pérdida de foco real
+      if (reason === 'cambio de pestaña' || reason === 'pérdida de foco de ventana') {
+        // Si se sale de la pestaña o ventana, SÍ contar tiempo fuera
+        const newLeaveTime = toUTC(new Date()).getTime();
+        setLeaveTime(newLeaveTime);
+        return;
+      }
+      // Si es cualquier otro evento (teclas, copiar, etc), ignorar
       return;
     }
 
@@ -116,7 +131,19 @@ export function useFraudDetection({ submissionId, onFraudDetected, onTimeOutside
     };
 
     const handleWindowBlur = async () => {
-      registerFraudAttempt('pérdida de foco de ventana');
+      // Esperar un tick para que document.activeElement se actualice
+      setTimeout(() => {
+        // Si la ayuda está abierta y el foco fue al iframe de ayuda, ignorar el blur
+        if (isHelpModalOpenRef.current) {
+          const iframe = document.querySelector('iframe');
+          if (iframe && document.activeElement === iframe) {
+            // No contar tiempo fuera ni fraude
+            return;
+          }
+        }
+        // Si no, registrar intento de fraude normalmente
+        registerFraudAttempt('pérdida de foco de ventana');
+      }, 0);
     };
 
     const handleWindowFocus = async () => {
@@ -131,13 +158,6 @@ export function useFraudDetection({ submissionId, onFraudDetected, onTimeOutside
         registerFraudAttempt(`uso de tecla sospechosa: ${e.key}`);
         e.preventDefault();
         return false;
-      }
-    };
-
-    const handleResize = async () => {
-      if (window.outerHeight < window.innerHeight ||
-        window.outerWidth < window.innerWidth) {
-        registerFraudAttempt('cambio de tamaño de ventana');
       }
     };
 
@@ -172,7 +192,6 @@ export function useFraudDetection({ submissionId, onFraudDetected, onTimeOutside
     window.addEventListener('blur', handleWindowBlur);
     window.addEventListener('focus', handleWindowFocus);
     document.addEventListener('keydown', handleKeyDown, true);
-    window.addEventListener('resize', handleResize);
     document.addEventListener('copy', handleCopy);
     document.addEventListener('paste', handlePaste);
     document.addEventListener('dragstart', handleDragStart);
@@ -187,21 +206,16 @@ export function useFraudDetection({ submissionId, onFraudDetected, onTimeOutside
       };
     }
 
-    // Detector de DevTools
-    let devtoolsOpen = false;
-    const threshold = 160;
-    const devtoolsInterval = setInterval(() => {
-      const widthThreshold = window.outerWidth - window.innerWidth > threshold;
-      const heightThreshold = window.outerHeight - window.innerHeight > threshold;
-      if (widthThreshold || heightThreshold) {
-        if (!devtoolsOpen) {
-          devtoolsOpen = true;
-          setIsDevToolsModalOpen(true);
-        }
-      } else {
-        devtoolsOpen = false;
-      }
-    }, 500);
+    // Si existe el iframe de ayuda, agregar listeners para detectar interacción
+    const iframe = document.querySelector('iframe');
+    if (iframe) {
+      iframe.addEventListener('mousedown', () => {
+        isInteractingWithHelpIframeRef.current = true;
+      });
+      iframe.addEventListener('focus', () => {
+        isInteractingWithHelpIframeRef.current = true;
+      });
+    }
 
     // Cleanup
     return () => {
@@ -209,7 +223,6 @@ export function useFraudDetection({ submissionId, onFraudDetected, onTimeOutside
       window.removeEventListener('blur', handleWindowBlur);
       window.removeEventListener('focus', handleWindowFocus);
       document.removeEventListener('keydown', handleKeyDown, true);
-      window.removeEventListener('resize', handleResize);
       document.removeEventListener('copy', handleCopy);
       document.removeEventListener('paste', handlePaste);
       document.removeEventListener('dragstart', handleDragStart);
@@ -219,7 +232,14 @@ export function useFraudDetection({ submissionId, onFraudDetected, onTimeOutside
         navigator.share = originalShare;
       }
 
-      clearInterval(devtoolsInterval);
+      if (iframe) {
+        iframe.removeEventListener('mousedown', () => {
+          isInteractingWithHelpIframeRef.current = true;
+        });
+        iframe.removeEventListener('focus', () => {
+          isInteractingWithHelpIframeRef.current = true;
+        });
+      }
     };
   }, [submissionId, registerFraudAttempt, registerUserReturn]);
 
@@ -232,8 +252,6 @@ export function useFraudDetection({ submissionId, onFraudDetected, onTimeOutside
     setIsFraudModalOpen,
     setHelpModalOpen: (isOpen: boolean) => {
       isHelpModalOpenRef.current = isOpen;
-    },
-    isDevToolsModalOpen,
-    setIsDevToolsModalOpen
+    }
   };
-} 
+}

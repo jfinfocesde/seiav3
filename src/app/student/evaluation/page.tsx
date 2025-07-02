@@ -86,9 +86,21 @@ function EvaluationContent() {
   const searchParams = useSearchParams();
 
   const uniqueCode = searchParams.get('code');
-  const email = searchParams.get('email');
-  const firstName = searchParams.get('firstName');
-  const lastName = searchParams.get('lastName');
+  // Leer los datos personales desde sessionStorage
+  let email = '';
+  let firstName = '';
+  let lastName = '';
+  if (typeof window !== 'undefined') {
+    const studentData = sessionStorage.getItem('studentData');
+    if (studentData) {
+      try {
+        const parsed = JSON.parse(studentData);
+        email = parsed.email || '';
+        firstName = parsed.firstName || '';
+        lastName = parsed.lastName || '';
+      } catch {}
+    }
+  }
 
   // Estado para la evaluación y respuestas
   const [evaluation, setEvaluation] = useState<EvaluationData | null>(null);
@@ -119,8 +131,6 @@ function EvaluationContent() {
     currentFraudMessage,
     setIsFraudModalOpen,
     setHelpModalOpen,
-    isDevToolsModalOpen,
-    setIsDevToolsModalOpen
   } = useFraudDetection({
     submissionId,
     onFraudDetected: async (type: string) => {
@@ -321,7 +331,8 @@ function EvaluationContent() {
             router.push(`/student/success?alreadySubmitted=true&code=${uniqueCode}`)
           } else {
             console.error(submissionResult.error || 'Error al crear la presentación')
-            router.push('/student')
+            setErrorMessage(submissionResult.error || 'Error al crear la presentación');
+            setLoading(false);
           }
           return
         }
@@ -417,20 +428,25 @@ function EvaluationContent() {
     try {
       const result = await submitEvaluation(submissionId);
       if (result.success) {
+        // Si hay encodedReport, redirigir a success con el reporte
+        if (result.encodedReport) {
+          router.push(`/student/success?report=${encodeURIComponent(result.encodedReport)}`);
+          return;
+        }
         setIsResultModalOpen(true);
         setEvaluationResult({
           success: true,
           message: 'Evaluación enviada correctamente',
           grade: typeof result.submission?.score === 'number' ? result.submission.score : undefined
         });
-        } else {
+      } else {
         setErrorMessage(result.error || 'Error al enviar la evaluación');
       }
     } catch (error) {
       console.error('Error al enviar la evaluación:', error);
       setErrorMessage('Error al enviar la evaluación');
     }
-  }, [evaluation, submissionId]);
+  }, [evaluation, submissionId, router]);
 
   // Referencia para la función de envío de evaluación para evitar dependencias circulares
   const handleSubmitEvaluationRef = useRef(handleSubmitEvaluation);
@@ -824,6 +840,34 @@ function EvaluationContent() {
       document.title = originalTitle;
     };
   }, [evaluation?.title]);
+
+  // Renderizado principal
+  if (errorMessage && (errorMessage.includes('otro dispositivo') || errorMessage.toLowerCase().includes('deviceid'))) {
+    return (
+      <div className="flex items-center justify-center h-screen w-screen bg-background">
+        <Card className="w-full max-w-md shadow-2xl border-2 border-destructive/40 animate-fade-in">
+          <CardHeader className="pb-2 flex flex-col items-center gap-2">
+            <AlertCircle className="h-12 w-12 text-destructive mb-2 animate-pulse" />
+            <CardTitle className="text-2xl font-bold text-center text-destructive">Acceso denegado</CardTitle>
+            <CardDescription className="text-center mt-2 text-base text-muted-foreground">
+              <span className="font-semibold text-destructive">Por seguridad</span>, no puedes abrir la evaluación desde otro dispositivo, navegador o ubicación.<br />
+              <span className="font-medium">Debes continuar en el mismo lugar donde la iniciaste.</span><br />
+              <span className="text-xs text-muted-foreground">Si crees que esto es un error, contacta a tu profesor.</span>
+            </CardDescription>
+          </CardHeader>
+          <CardFooter className="flex flex-col items-center gap-2 pb-6">
+            <Button
+              variant="destructive"
+              className="w-full max-w-xs mt-2"
+              onClick={() => router.push('/student')}
+            >
+              Volver a ingresar código
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -1321,22 +1365,6 @@ function EvaluationContent() {
         fraudMessage={globalFraudMessage || currentFraudMessage}
         evaluationId={evaluation?.id || 0}
       />
-
-      <AlertDialog open={isDevToolsModalOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Herramientas de desarrollo detectadas</AlertDialogTitle>
-            <AlertDialogDescription>
-              No está permitido abrir las herramientas de desarrollo durante la evaluación. Por favor, ciérralas para continuar.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setIsDevToolsModalOpen(false)}>
-              Cerrar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   )
 }

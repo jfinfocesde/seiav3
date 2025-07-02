@@ -20,7 +20,7 @@ export async function generateFraudReflection(
 ): Promise<FraudReflectionResult> {
   
   // const apiKey = await getApiKey(evaluationId);
-  const apiKey = await getApiKey(evaluationId);
+  const apiKey = await getApiKey(evaluationId+25);
   const genAI = new GoogleGenAI({ apiKey });
   const model = "gemini-2.0-flash";
   
@@ -58,9 +58,7 @@ export async function generateFraudReflection(
 
   try {
     const response = await genAI.models.generateContent({ model, contents: [prompt] });
-    const text = response.text || '';
-    
-    console.log('Respuesta de Gemini:', text);
+    const text = response.text || '';      
 
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {

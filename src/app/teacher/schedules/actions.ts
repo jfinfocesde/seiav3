@@ -239,4 +239,10 @@ export async function getStudentScoreHistory(attemptId: number) {
   }));
 
   return histories;
+}
+
+export async function deleteSubmission(submissionId: number) {
+  return await prisma.submission.delete({
+    where: { id: submissionId },
+  });
 } 

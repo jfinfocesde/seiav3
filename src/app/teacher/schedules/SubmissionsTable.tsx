@@ -12,9 +12,10 @@ interface Submission {
 interface SubmissionsTableProps {
   submissions: Submission[];
   onViewDetails: (id: number) => void;
+  onDelete: (id: number) => void;
 }
 
-export function SubmissionsTable({ submissions, onViewDetails }: SubmissionsTableProps) {
+export function SubmissionsTable({ submissions, onViewDetails, onDelete }: SubmissionsTableProps) {
   return (
     <div className="w-full overflow-x-auto">
       <table className="w-full border text-sm">
@@ -38,6 +39,9 @@ export function SubmissionsTable({ submissions, onViewDetails }: SubmissionsTabl
                 <div className="flex gap-2 justify-end">
                   <Button variant="secondary" size="sm" onClick={() => onViewDetails(s.id)}>
                     Ver Detalles
+                  </Button>
+                  <Button variant="destructive" size="sm" onClick={() => onDelete(s.id)}>
+                    Eliminar
                   </Button>
                 </div>
               </td>

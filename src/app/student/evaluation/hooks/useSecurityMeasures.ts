@@ -47,15 +47,6 @@ export const useSecurityMeasures = (
         window.dispatchEvent(event);
       }
 
-      // Verificar si las devtools están abiertas
-      const devtoolsOpen = window.outerHeight - window.innerHeight > 200;
-      if (devtoolsOpen) {
-        const event = new CustomEvent('fraud-detected', {
-          detail: { type: 'devtools-open' }
-        });
-        window.dispatchEvent(event);
-      }
-
       // Verificar si el DOM ha sido manipulado
       if (type === 'monaco' && 'getModel' in element) {
         const editor = element as editor.IStandaloneCodeEditor;
@@ -213,4 +204,4 @@ export const useSecurityMeasures = (
       }
     };
   }, [elementRef, type]);
-}; 
+};
