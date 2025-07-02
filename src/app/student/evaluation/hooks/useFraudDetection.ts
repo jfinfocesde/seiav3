@@ -217,17 +217,6 @@ export function useFraudDetection({ submissionId, onFraudDetected, onTimeOutside
       });
     }
 
-    // Si existe el iframe de ayuda, agregar listeners para detectar interacción
-    const iframe = document.querySelector('iframe');
-    if (iframe) {
-      iframe.addEventListener('mousedown', () => {
-        isInteractingWithHelpIframeRef.current = true;
-      });
-      iframe.addEventListener('focus', () => {
-        isInteractingWithHelpIframeRef.current = true;
-      });
-    }
-
     // Cleanup
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -241,15 +230,6 @@ export function useFraudDetection({ submissionId, onFraudDetected, onTimeOutside
 
       if (navigator.share && originalShare) {
         navigator.share = originalShare;
-      }
-
-      if (iframe) {
-        iframe.removeEventListener('mousedown', () => {
-          isInteractingWithHelpIframeRef.current = true;
-        });
-        iframe.removeEventListener('focus', () => {
-          isInteractingWithHelpIframeRef.current = true;
-        });
       }
 
       if (iframe) {
