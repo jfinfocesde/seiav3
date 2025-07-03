@@ -35,7 +35,6 @@ import ThemeToggle from '@/components/theme/ThemeToggle'
 // Servicios para evaluar con Gemini AI
 import { getAIFeedback } from '@/lib/gemini-code-evaluation';
 import { evaluateTextResponse } from '@/lib/gemini-text-evaluation';
-import { generateFraudReflection } from '@/lib/gemini-fraud-reflection';
 
 // Tipos para los modelos de datos
 type Question = {
@@ -126,14 +125,13 @@ function EvaluationContent() {
   const {
     fraudAttempts,
     timeOutsideEval,
-    isFraudModalOpen,
-    currentFraudType,
+    isFraudModalOpen,    
     currentFraudMessage,
     setIsFraudModalOpen,
     setHelpModalOpen,
   } = useFraudDetection({
     submissionId,
-    onFraudDetected: async (type: string) => {
+    onFraudDetected: async () => {
       if (currentAnswer && submissionId && evaluation) {
         try {
           const { saveAnswer } = await import('./actions');
@@ -145,7 +143,6 @@ function EvaluationContent() {
             fraudAttemptsRef.current + 1,
             timeOutsideEvalRef.current
           );
-          await generateFraudReflection(type, fraudAttemptsRef.current + 1, timeOutsideEvalRef.current, evaluation.id);
         } catch (error) {
           console.error('Error al guardar intento de fraude:', error);
         }
@@ -428,17 +425,9 @@ function EvaluationContent() {
     try {
       const result = await submitEvaluation(submissionId);
       if (result.success) {
-        // Si hay encodedReport, redirigir a success con el reporte
-        if (result.encodedReport) {
-          router.push(`/student/success?report=${encodeURIComponent(result.encodedReport)}`);
-          return;
-        }
-        setIsResultModalOpen(true);
-        setEvaluationResult({
-          success: true,
-          message: 'Evaluación enviada correctamente',
-          grade: typeof result.submission?.score === 'number' ? result.submission.score : undefined
-        });
+        // Redirigir a la página de reporte con los datos por query params
+        router.push(`/student/report?name=${encodeURIComponent(firstName + ' ' + lastName)}&grade=${result.submission?.score ?? ''}&date=${encodeURIComponent(new Date().toLocaleString())}`)
+        return;
       } else {
         setErrorMessage(result.error || 'Error al enviar la evaluación');
       }
@@ -446,7 +435,7 @@ function EvaluationContent() {
       console.error('Error al enviar la evaluación:', error);
       setErrorMessage('Error al enviar la evaluación');
     }
-  }, [evaluation, submissionId, router]);
+  }, [evaluation, submissionId, router, firstName, lastName]);
 
   // Referencia para la función de envío de evaluación para evitar dependencias circulares
   const handleSubmitEvaluationRef = useRef(handleSubmitEvaluation);
@@ -841,31 +830,38 @@ function EvaluationContent() {
     };
   }, [evaluation?.title]);
 
-  // Renderizado principal
-  if (errorMessage && (errorMessage.includes('otro dispositivo') || errorMessage.toLowerCase().includes('deviceid'))) {
+  // Modal para evaluación en curso en otro dispositivo/navegador
+  function EvaluationInProgressModal({ onBack }: { onBack: () => void }) {
     return (
       <div className="flex items-center justify-center h-screen w-screen bg-background">
-        <Card className="w-full max-w-md shadow-2xl border-2 border-destructive/40 animate-fade-in">
+        <Card className="w-full max-w-md shadow-2xl border-2 border-yellow-400 animate-fade-in">
           <CardHeader className="pb-2 flex flex-col items-center gap-2">
-            <AlertCircle className="h-12 w-12 text-destructive mb-2 animate-pulse" />
-            <CardTitle className="text-2xl font-bold text-center text-destructive">Acceso denegado</CardTitle>
+            <AlertCircle className="h-12 w-12 text-yellow-500 mb-2 animate-pulse" />
+            <CardTitle className="text-2xl font-bold text-center text-yellow-700">Evaluación en curso</CardTitle>
             <CardDescription className="text-center mt-2 text-base text-muted-foreground">
-              <span className="font-semibold text-destructive">Por seguridad</span>, no puedes abrir la evaluación desde otro dispositivo, navegador o ubicación.<br />
+              Ya tienes una evaluación en curso en otro dispositivo, navegador o ubicación.<br />
               <span className="font-medium">Debes continuar en el mismo lugar donde la iniciaste.</span><br />
               <span className="text-xs text-muted-foreground">Si crees que esto es un error, contacta a tu profesor.</span>
             </CardDescription>
           </CardHeader>
           <CardFooter className="flex flex-col items-center gap-2 pb-6">
             <Button
-              variant="destructive"
+              variant="secondary"
               className="w-full max-w-xs mt-2"
-              onClick={() => router.push('/student')}
+              onClick={onBack}
             >
               Volver a ingresar código
             </Button>
           </CardFooter>
         </Card>
       </div>
+    );
+  }
+
+  // Renderizado principal
+  if (errorMessage && (errorMessage.includes('otro dispositivo') || errorMessage.toLowerCase().includes('deviceid'))) {
+    return (
+      <EvaluationInProgressModal onBack={() => router.push('/student')} />
     );
   }
 
@@ -1360,10 +1356,7 @@ function EvaluationContent() {
       <FraudReflectionModal
         isOpen={isFraudModalOpen}
         onClose={() => setIsFraudModalOpen(false)}
-        fraudType={globalFraudMessage ? 'combinacion-teclas' : currentFraudType}
-        fraudCount={fraudAttempts}
         fraudMessage={globalFraudMessage || currentFraudMessage}
-        evaluationId={evaluation?.id || 0}
       />
     </div>
   )

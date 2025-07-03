@@ -103,25 +103,26 @@ export async function createSubmission(attemptId: number, email: string, firstNa
       deviceId = randomUUID();
       cookies.set('deviceId', deviceId, { httpOnly: true, sameSite: 'lax', path: '/', maxAge: 60 * 60 * 24 * 30 }); // 30 días
     }
-    // Verificar si ya existe una submission para este intento y deviceId
-    const existingByDevice = await prisma.submission.findFirst({
+    // Verificar si ya existe una submission para este intento, deviceId Y email
+    const existingByDeviceAndEmail = await prisma.submission.findFirst({
       where: {
         attemptId,
         deviceId,
+        email,
       },
       orderBy: {
         createdAt: 'desc'
       }
     });
-    if (existingByDevice) {
-      // Si ya existe una submission para este deviceId, devolverla
-      if (existingByDevice.submittedAt !== null) {
+    if (existingByDeviceAndEmail) {
+      // Si ya existe una submission para este deviceId y email, devolverla
+      if (existingByDeviceAndEmail.submittedAt !== null) {
         return {
           success: false,
-          error: 'Esta evaluación ya fue enviada desde este dispositivo.'
+          error: 'Esta evaluación ya fue enviada desde este dispositivo para este usuario.'
         };
       }
-      return { success: true, submission: existingByDevice };
+      return { success: true, submission: existingByDeviceAndEmail };
     }
 
     // Verificar si ya existe una submission para este intento y email (pero con otro deviceId)
@@ -528,52 +529,10 @@ export async function submitEvaluation(submissionId: number) {
       });
     });
     
-    // Preparar los datos para el reporte
-    const { generateEvaluationReport } = await import('@/lib/gemini-report-generation');
-    
-    // Verificar que existingSubmission y answersResult.answers no sean null o undefined
-    if (!existingSubmission || !answersResult.answers) {
-      throw new Error('Datos de presentación o respuestas no disponibles');
-    }
-    
-    // Formatear las respuestas para el reporte
-    const answerSummaries = answersResult.answers.map(answer => ({
-      questionText: answer.question.text,
-      questionType: answer.question.type,
-      studentAnswer: answer.answer,
-      score: answer.score,
-      language: answer.question.type === 'CODE'
-        ? JSON.parse(answer.answer || '{}').language || 'javascript'
-        : undefined
-    }));
-    
-    // Generar el reporte
-    const report = await generateEvaluationReport(
-      `${existingSubmission.firstName || ''} ${existingSubmission.lastName || ''}`.trim(),
-      existingSubmission.attempt?.evaluation?.title || 'Evaluación',
-      answerSummaries,
-      scoreResult.averageScore || 0,
-      existingSubmission.fraudAttempts || 0,
-      existingSubmission.attempt?.evaluation?.id // Pasar evaluationId
-    );
-    
-    // Codificar el reporte para pasarlo como parámetro URL
-    let encodedReport = '';
-    try {
-      const reportJson = JSON.stringify(report);
-      console.log('Reporte a codificar:', reportJson);
-      encodedReport = Buffer.from(reportJson).toString('base64');
-      console.log('Reporte codificado:', encodedReport);
-    } catch (encodeError) {
-      console.error('Error al codificar el reporte:', encodeError);
-    }
-
     revalidatePath('/student');
     return { 
       success: true, 
-      submission,
-      report,
-      encodedReport
+      submission
     };
   } catch (error) {
     console.error('Error al enviar la evaluación:', error);

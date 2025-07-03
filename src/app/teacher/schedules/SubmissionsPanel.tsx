@@ -88,7 +88,6 @@ export function SubmissionsPanel({ attemptId, onBack }: SubmissionsPanelProps) {
   };
 
   const handleDelete = async (submissionId: number) => {
-    if (!window.confirm('¿Estás seguro de que deseas eliminar esta presentación? El usuario podrá volver a ingresar a la evaluación.')) return;
     await deleteSubmission(submissionId);
     setSubmissions(submissions => submissions.filter(s => s.id !== submissionId));
   };

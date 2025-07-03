@@ -50,6 +50,12 @@ export default function StudentEntryPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    // Limpiar almacenamiento antes de iniciar nueva sesión
+    if (typeof window !== 'undefined') {
+      sessionStorage.clear();
+      localStorage.clear();
+    }
+
     if (!uniqueCode.trim()) {
       console.error('Por favor, ingresa el código de evaluación')
       return
