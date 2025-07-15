@@ -47,6 +47,13 @@ const tools = [
 		icon: <FileText className="h-8 w-8 text-purple-500" />,
 		href: '/teacher/tools/translator',
 	},
+	{
+		name: 'Buscador de Forks de GitHub',
+		description:
+			'Conéctate con la API de GitHub para buscar y visualizar los forks de cualquier repositorio público.',
+		icon: <FileText className="h-8 w-8 text-gray-500" />,
+		href: '/teacher/tools/github-forks',
+	},
 ];
 
 export default function ToolsPanel() {

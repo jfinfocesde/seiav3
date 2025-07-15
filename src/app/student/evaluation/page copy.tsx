@@ -7,7 +7,6 @@ import { CodeEditor } from '@/app/student/evaluation/components/code-editor'
 import { MarkdownViewer } from '@/app/student/evaluation/components/markdown-viewer'
 import { LANGUAGE_OPTIONS } from '@/lib/constants/languages'
 import { useTheme } from 'next-themes'
-import devtools from 'devtools-detect';
 
 // Función de debounce personalizada para reducir peticiones a la base de datos
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -858,24 +857,6 @@ function EvaluationContent() {
       </div>
     );
   }
-
-  // Detección de DevTools: debe ir al inicio, junto con el resto de hooks
-  useEffect(() => {
-    const handleDevTools = (event: CustomEvent<{ isOpen: boolean }>) => {
-      if (event.detail.isOpen) {
-        window.close();
-        window.location.href = 'about:blank';
-      }
-    };
-    window.addEventListener('devtoolschange', handleDevTools as EventListener);
-    if (devtools.isOpen) {
-      window.close();
-      window.location.href = 'about:blank';
-    }
-    return () => {
-      window.removeEventListener('devtoolschange', handleDevTools as EventListener);
-    };
-  }, []);
 
   // Renderizado principal
   if (errorMessage && (errorMessage.includes('otro dispositivo') || errorMessage.toLowerCase().includes('deviceid'))) {
